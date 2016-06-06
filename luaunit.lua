@@ -29,7 +29,7 @@ M.LIST_DIFF_ANALYSIS_THRESHOLD  = 10    -- display deep analysis for more than 1
 -- Should _is_table_equals() evaluate table-type keys "by content"?
 M.TABLE_EQUALS_KEYBYCONTENT = true
 -- Should _is_table_equals() consider tables "recurring the same way" equal?
-M.TABLE_EQUALS_RECURSIONDEFAULT = false
+M.TABLE_EQUALS_RECURSIONDEFAULT = true
 
 --[[ M.EPSILON is meant to help with Lua's floating point math in simple corner
 cases like almostEquals(1.1-0.1, 1), which may not work as-is (e.g. on numbers
