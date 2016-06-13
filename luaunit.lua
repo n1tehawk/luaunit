@@ -23,10 +23,13 @@ assertEquals( expected, actual ).
 ]]--
 M.ORDER_ACTUAL_EXPECTED = true
 M.PRINT_TABLE_REF_IN_ERROR_MSG = false
-M.TABLE_EQUALS_KEYBYCONTENT = true
 M.LINE_LENGTH = 80
 M.TABLE_DIFF_ANALYSIS_THRESHOLD = 10    -- display deep analysis for more than 10 items
 M.LIST_DIFF_ANALYSIS_THRESHOLD  = 10    -- display deep analysis for more than 10 items
+-- Should _is_table_equals() evaluate table-type keys "by content"?
+M.TABLE_EQUALS_KEYBYCONTENT = true
+-- Should _is_table_equals() consider tables "recurring the same way" equal?
+M.TABLE_EQUALS_RECURSIONDEFAULT = false
 
 --[[ M.EPSILON is meant to help with Lua's floating point math in simple corner
 cases like almostEquals(1.1-0.1, 1), which may not work as-is (e.g. on numbers
@@ -974,9 +977,12 @@ local function _is_table_equals(actual, expected, recursions)
             return previous
         end
 
-        -- Mark this (actual,expected) pair, so we won't recurse it again. For
-        -- now, assume a "false" result, which we might adjust later if needed.
-        recursions:store(actual, expected, false)
+        -- Mark this (actual,expected) pair, so we won't recurse it again.
+        -- The default value used here affects "equality" when tables are
+        -- recursive: `false` requires them to match "by value" (= identical
+        -- table references), `true` corresponds to a much more general
+        -- condition of "loops in a similar way".
+        recursions:store(actual, expected, M.TABLE_EQUALS_RECURSIONDEFAULT)
 
         -- Tables must have identical element count, or they can't match.
         if (#actual ~= #expected) then
