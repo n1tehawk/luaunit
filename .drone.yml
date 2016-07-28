@@ -1,0 +1,21 @@
+# Build configuration for Tea CI, https://www.tea-ci.org
+
+matrix:
+  LUA:
+    - lua5.1.exe
+    - lua52.exe
+    - lua53.exe
+#    - luajit
+#    - luajit20
+#    - luajit21
+
+build:
+  image: teaci/msys32
+  pull: true
+  shell: msys32
+  commands:
+    - pacman -S --needed --noconfirm --noprogressbar unzip
+    - .teaci/install-lua.sh
+    - echo LUA=$LUA
+    - ./$LUA -v run_unit_tests.lua
+    - ./$LUA run_functional_tests.lua -v
