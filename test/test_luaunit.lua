@@ -2725,28 +2725,39 @@ TestLuaUnitResults = { __class__ = 'TestLuaUnitResults' }
 
     function TestLuaUnitResults:test_statusLine()
         -- full success
-        local r = {runCount=5, duration=0.17, passedCount=5, notPassedCount=0, failureCount=0, errorCount=0, nonSelectedCount=0}
+        local r = {runCount=5, duration=0.17, passedCount=5, notPassedCount=0,
+                   failureCount=0, errorCount=0, skippedCount=0, nonSelectedCount=0}
         lu.assertEquals( lu.LuaUnit.statusLine(r), 'Ran 5 tests in 0.170 seconds, 5 successes, 0 failures')
 
         -- 1 failure, nothing more displayed
-        r = {runCount=5, duration=0.17, passedCount=4, notPassedCount=1, failureCount=1, errorCount=0, nonSelectedCount=0}
+        r = {runCount=5, duration=0.17, passedCount=4, notPassedCount=1,
+             failureCount=1, errorCount=0, skippedCount=0, nonSelectedCount=0}
         lu.assertEquals( lu.LuaUnit.statusLine(r), 'Ran 5 tests in 0.170 seconds, 4 successes, 1 failure')
 
         -- 1 error, no failure displayed
-        r = {runCount=5, duration=0.17, passedCount=4, notPassedCount=1, failureCount=0, errorCount=1, nonSelectedCount=0}
+        r = {runCount=5, duration=0.17, passedCount=4, notPassedCount=1,
+             failureCount=0, errorCount=1, skippedCount=0, nonSelectedCount=0}
         lu.assertEquals( lu.LuaUnit.statusLine(r), 'Ran 5 tests in 0.170 seconds, 4 successes, 1 error')
 
         -- 1 error, 1 failure 
-        r = {runCount=5, duration=0.17, passedCount=3, notPassedCount=2, failureCount=1, errorCount=1, nonSelectedCount=0}
+        r = {runCount=5, duration=0.17, passedCount=3, notPassedCount=2,
+             failureCount=1, errorCount=1, skippedCount=0, nonSelectedCount=0}
         lu.assertEquals( lu.LuaUnit.statusLine(r), 'Ran 5 tests in 0.170 seconds, 3 successes, 1 failure, 1 error')
 
         -- 1 error, 1 failure, 1 non selected
-        r = {runCount=5, duration=0.17, passedCount=3, notPassedCount=2, failureCount=1, errorCount=1, nonSelectedCount=1}
+        r = {runCount=5, duration=0.17, passedCount=3, notPassedCount=2,
+             failureCount=1, errorCount=1, skippedCount=0, nonSelectedCount=1}
         lu.assertEquals( lu.LuaUnit.statusLine(r), 'Ran 5 tests in 0.170 seconds, 3 successes, 1 failure, 1 error, 1 non-selected')
 
         -- full success, 1 non selected
-        r = {runCount=5, duration=0.17, passedCount=5, notPassedCount=0, failureCount=0, errorCount=0, nonSelectedCount=1}
+        r = {runCount=5, duration=0.17, passedCount=5, notPassedCount=0,
+             failureCount=0, errorCount=0, skippedCount=0, nonSelectedCount=1}
         lu.assertEquals( lu.LuaUnit.statusLine(r), 'Ran 5 tests in 0.170 seconds, 5 successes, 0 failures, 1 non-selected')
+
+        -- mix including a skipped test
+        r = {runCount=5, duration=0.17, passedCount=1, notPassedCount=2,
+             failureCount=1, errorCount=1, skippedCount=1, nonSelectedCount=1}
+        lu.assertEquals( lu.LuaUnit.statusLine(r), 'Ran 5 tests in 0.170 seconds, 1 success, 1 skipped, 1 failure, 1 error, 1 non-selected')
     end
 
     function TestLuaUnitResults:test_nodeStatus()
@@ -2811,6 +2822,10 @@ TestLuaUnitResults = { __class__ = 'TestLuaUnitResults' }
                                   'MyTestSkipped' } )
         lu.assertEquals( #runner.result.tests, 9 )
         lu.assertEquals( #runner.result.notPassed, 0 )
+        lu.assertEquals( runner.result.testCount, 9 )
+        lu.assertEquals( runner.result.runCount, 9 )
+        lu.assertEquals( runner.result.passedCount, 7 )
+        lu.assertEquals( runner.result.skippedCount, 2 )
 
         lu.assertEquals( runner.result.tests[1].testName,"MyTestToto2.test1" )
         lu.assertEquals( runner.result.tests[1].number, 1 )
