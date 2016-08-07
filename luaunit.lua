@@ -64,6 +64,7 @@ M.DISABLE_DEEP_ANALYSIS = false
 local cmdline_argv = rawget(_G, "arg")
 
 M.FAILURE_PREFIX = 'LuaUnit test FAILURE: ' -- prefix string for failed tests
+M.SKIPPED_PREFIX = 'LuaUnit test SKIPPED: ' -- prefix string for skipped tests
 
 M.USAGE=[[Usage: lua <your_test_suite.lua> [options] [testname1 [testname2] ... ]
 Options:
@@ -1069,6 +1070,11 @@ end
 M.private._is_table_equals = _is_table_equals
 is_equal = _is_table_equals
 
+local function error_fmt(level, ...)
+    -- printf-style error()
+    error(string.format(...), (level or 1) + 1)
+end
+
 local function failure(msg, level)
     -- raise an error indicating a test failure
     -- for error() compatibility we adjust "level" here (by +1), to report the
@@ -1077,15 +1083,22 @@ local function failure(msg, level)
 end
 
 local function fail_fmt(level, ...)
-     -- failure with printf-style formatted message and given error level
+    -- failure with printf-style formatted message and given error level
     failure(string.format(...), (level or 1) + 1)
 end
 M.private.fail_fmt = fail_fmt
 
-local function error_fmt(level, ...)
-     -- printf-style error()
-    error(string.format(...), (level or 1) + 1)
+local function skipped(msg, level)
+    -- raise an error indicating that a test was skipped on purpose
+    error(M.SKIPPED_PREFIX .. msg, (level or 1) + 1)
 end
+
+local function skip_fmt(level, fmt, ...)
+    -- skipped() with printf-style formatted message and given error level
+    fmt = fmt or "Test skipped."
+    skipped(string.format(fmt, ...), (level or 1) + 1)
+end
+M.private.skip_fmt = skip_fmt
 
 ----------------------------------------------------------------
 --
@@ -1479,6 +1492,18 @@ function M.assertItemsEquals(actual, expected)
         expected, actual = prettystrPairs(expected, actual)
         fail_fmt(2, 'Contents of the tables are not identical:\nExpected: %s\nActual: %s',
                  expected, actual)
+    end
+end
+
+-- skipping of tests (implemented as specialized "errors")
+
+function M.skip(fmt, ...)
+    skip_fmt(2, fmt, ...)
+end
+
+function M.skipIf(condition, fmt, ...)
+    if condition then
+        skip_fmt(2, fmt, ...)
     end
 end
 
@@ -2441,6 +2466,8 @@ end
         elseif err.status == NodeStatus.ERROR then
             node:error( err.msg, err.trace )
             table.insert( self.result.errors, node )
+        elseif err.status == NodeStatus.SKIPPED then
+            node:skipped( err.msg, err.trace )
         end
 
         if node:isFailure() or node:isError() then
@@ -2549,14 +2576,19 @@ end
             return {status = NodeStatus.PASS}
         end
 
-        -- determine if the error was a failed test:
-        -- We do this by stripping the failure prefix from the error message,
-        -- while keeping track of the gsub() count. A non-zero value -> failure
-        local failed, iter_msg
+        -- Determine if the error was a failed or skipped test:
+        -- We do this by stripping the specific prefix from the error message,
+        -- while keeping track of the gsub() count. A non-zero value -> matched
+        local found, iter_msg
         iter_msg = self.exeCount and 'iteration: '..self.currentCount..', '
-        err.msg, failed = err.msg:gsub(M.FAILURE_PREFIX, iter_msg or '', 1)
-        if failed > 0 then
+        err.msg, found = err.msg:gsub(M.FAILURE_PREFIX, iter_msg or '', 1)
+        if found > 0 then
             err.status = NodeStatus.FAIL
+        else
+            err.msg, found = err.msg:gsub(M.SKIPPED_PREFIX, iter_msg or '', 1)
+            if found > 0 then
+                err.status = NodeStatus.SKIPPED
+            end
         end
 
         -- reformat / improve the stack trace
