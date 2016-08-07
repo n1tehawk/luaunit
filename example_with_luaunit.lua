@@ -81,6 +81,18 @@ TestToto = {} --class
         error('Bouhouhoum error!')
     end
 
+    function TestToto:test9a()
+        -- skip test
+        lu.skip("Skipped on purpose.")
+        error('Did not skip() as expected')
+    end
+
+    function TestToto:test9b()
+        -- skip test conditionally
+        lu.skipIf(2 < 3, "Math is hard - skipped.")
+        error('Did not skipIf() as expected')
+    end
+
 
 -- class TestToto
 

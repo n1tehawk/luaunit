@@ -1,8 +1,8 @@
-Started on 01/27/16 21:35:20
+Started on 10/12/16 12:29:41
     TestTiti.test1_withFailure ... FAIL
-example_with_luaunit.lua:104: expected: 2, actual: 1
+example_with_luaunit.lua:116: expected: 2, actual: 1
     TestTiti.test2_withFailure ... FAIL
-example_with_luaunit.lua:113: expected: "bof"
+example_with_luaunit.lua:125: expected: "bof"
 actual: "hop"
     TestTiti.test3 ... Ok
     TestToto.test1_withFailure ... FAIL
@@ -24,24 +24,28 @@ actual: {1, 2}
 example_with_luaunit.lua:81: Bouhouhoum error!
     TestToto.test8b ... ERROR
 example_with_luaunit.lua:81: Bouhouhoum error!
+    TestToto.test9a ... SKIPPED
+example_with_luaunit.lua:86: Skipped on purpose.
+    TestToto.test9b ... SKIPPED
+example_with_luaunit.lua:92: Math is hard - skipped.
     test1_withFailure ... ERROR
-example_with_luaunit.lua:129: assertion failed!
+example_with_luaunit.lua:141: assertion failed!
     test2_withFailure ... ERROR
-example_with_luaunit.lua:135: assertion failed!
+example_with_luaunit.lua:147: assertion failed!
     test3 ... Ok
 =========================================================
 Failed tests:
 -------------
 1) TestTiti.test1_withFailure
-example_with_luaunit.lua:104: expected: 2, actual: 1
+example_with_luaunit.lua:116: expected: 2, actual: 1
 stack traceback:
-	example_with_luaunit.lua:104: in function 'TestTiti.test1_withFailure'
+	example_with_luaunit.lua:116: in function 'TestTiti.test1_withFailure'
 
 2) TestTiti.test2_withFailure
-example_with_luaunit.lua:113: expected: "bof"
+example_with_luaunit.lua:125: expected: "bof"
 actual: "hop"
 stack traceback:
-	example_with_luaunit.lua:113: in function 'TestTiti.test2_withFailure'
+	example_with_luaunit.lua:125: in function 'TestTiti.test2_withFailure'
 
 3) TestToto.test1_withFailure
 example_with_luaunit.lua:21: expected: 2, actual: 1
@@ -89,13 +93,13 @@ stack traceback:
 	example_with_luaunit.lua:73: in function 'TestToto.test8b'
 
 11) test1_withFailure
-example_with_luaunit.lua:129: assertion failed!
+example_with_luaunit.lua:141: assertion failed!
 stack traceback:
-	example_with_luaunit.lua:129: in function 'test1_withFailure'
+	example_with_luaunit.lua:141: in function 'test1_withFailure'
 
 12) test2_withFailure
-example_with_luaunit.lua:135: assertion failed!
+example_with_luaunit.lua:147: assertion failed!
 stack traceback:
-	example_with_luaunit.lua:135: in function 'test2_withFailure'
+	example_with_luaunit.lua:147: in function 'test2_withFailure'
 
-Ran 15 tests in 0.004 seconds, 3 successes, 8 failures, 4 errors
+Ran 17 tests in 0.002 seconds, 3 successes, 2 skipped, 8 failures, 4 errors

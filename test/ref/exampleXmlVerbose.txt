@@ -1,10 +1,10 @@
 # XML output to test/ref/exampleXmlVerbose.xml
-# Started on 01/30/16 22:19:37
+# Started on 10/12/16 12:31:12
 # Starting class: TestTiti
 # Starting test: TestTiti.test1_withFailure
-# Failure: example_with_luaunit.lua:104: expected: 2, actual: 1
+# Failure: example_with_luaunit.lua:116: expected: 2, actual: 1
 # Starting test: TestTiti.test2_withFailure
-# Failure: example_with_luaunit.lua:113: expected: "bof"
+# Failure: example_with_luaunit.lua:125: expected: "bof"
 actual: "hop"
 # Starting test: TestTiti.test3
 # Starting class: TestToto
@@ -27,9 +27,11 @@ actual: {1, 2}
 # Error: example_with_luaunit.lua:81: Bouhouhoum error!
 # Starting test: TestToto.test8b
 # Error: example_with_luaunit.lua:81: Bouhouhoum error!
+# Starting test: TestToto.test9a
+# Starting test: TestToto.test9b
 # Starting test: test1_withFailure
-# Error: example_with_luaunit.lua:129: assertion failed!
+# Error: example_with_luaunit.lua:141: assertion failed!
 # Starting test: test2_withFailure
-# Error: example_with_luaunit.lua:135: assertion failed!
+# Error: example_with_luaunit.lua:147: assertion failed!
 # Starting test: test3
-# Ran 15 tests in 0.015 seconds, 3 successes, 8 failures, 4 errors
+# Ran 17 tests in 0.002 seconds, 3 successes, 2 skipped, 8 failures, 4 errors
