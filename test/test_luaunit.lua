@@ -516,6 +516,27 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
         lu.assertEquals(tonumber(line2), tonumber(line1) + 3)
     end
 
+    function TestLuaUnitUtilities:test_SkipFmt()
+        -- skip tests from within nested functions
+        local function bar(level)
+            lu.private.skip_fmt(level, "hex=%X", 123)
+        end
+        local function foo(level)
+            bar(level)
+        end
+
+        local _, err = pcall(foo) -- default level 1 = error position in bar()
+        local line1, prefix = err:match("test[\\/]test_luaunit%.lua:(%d+): (.*)hex=7B$")
+        lu.assertEquals(prefix, lu.SKIPPED_PREFIX)
+        lu.assertNotNil(line1)
+        _, err = pcall(foo, 2) -- level 2 = error position within foo()
+        local line2, prefix = err:match("test[\\/]test_luaunit%.lua:(%d+): (.*)hex=7B$")
+        lu.assertEquals(prefix, lu.SKIPPED_PREFIX)
+        lu.assertNotNil(line2)
+        -- make sure that "line2" position is exactly 3 lines after "line1"
+        lu.assertEquals(tonumber(line2), tonumber(line1) + 3)
+    end
+
     function TestLuaUnitUtilities:test_IsFunction()
         -- previous LuaUnit.isFunction was superseded by LuaUnit.asFunction
         -- (which can also serve as a boolean expression)
@@ -1618,13 +1639,21 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
 local function assertFailureEquals(msg, ...)
     lu.assertErrorMsgEquals(lu.FAILURE_PREFIX .. msg, ...)
 end
-
 local function assertFailureMatches(msg, ...)
     lu.assertErrorMsgMatches(lu.FAILURE_PREFIX .. msg, ...)
 end
-
 local function assertFailureContains(msg, ...)
     lu.assertErrorMsgContains(lu.FAILURE_PREFIX .. msg, ...)
+end
+
+local function assertSkippedEquals(msg, ...)
+    lu.assertErrorMsgEquals(lu.SKIPPED_PREFIX .. msg, ...)
+end
+local function assertSkippedMatches(msg, ...)
+    lu.assertErrorMsgMatches(lu.SKIPPED_PREFIX .. msg, ...)
+end
+local function assertSkippedContains(msg, ...)
+    lu.assertErrorMsgContains(lu.SKIPPED_PREFIX .. msg, ...)
 end
 
 TestLuaUnitAssertionsError = {}
@@ -1941,6 +1970,12 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
 
     end
 
+    function TestLuaUnitErrorMsg:test_skippedMsgs()
+        assertSkippedEquals("Test skipped.", lu.skip) -- default message
+        assertSkippedEquals("hex=7B", lu.skip, "hex=%X", 123)
+        assertSkippedEquals("hex=7B", lu.skipIf, true, "hex=%X", 123)
+    end
+
 ------------------------------------------------------------------
 --
 --                       Execution Tests 
@@ -1973,6 +2008,21 @@ function MyTestFunction()
     table.insert( executedTests, "MyTestFunction" ) 
 end
 
+MyTestSkipped = {} --class
+    local function testSkippingWithConditional(cond)
+        lu.skipIf(false, "Skipped too early - this should not happen.")
+        lu.skipIf(cond, "Test %s conditionally.", "skipped")
+        lu.skip()
+        error("Never get here!")
+    end
+
+    function MyTestSkipped:test1()
+        testSkippingWithConditional(true) -- test skipIf()
+    end
+    function MyTestSkipped:test2()
+        testSkippingWithConditional(false) -- test skip()
+    end
+
 TestLuaUnitExecution = { __class__ = 'TestLuaUnitExecution' }
 
     function TestLuaUnitExecution:tearDown()
@@ -1988,7 +2038,9 @@ TestLuaUnitExecution = { __class__ = 'TestLuaUnitExecution' }
 
     function TestLuaUnitExecution:test_collectTests()
         local allTests = lu.LuaUnit.collectTests()
-        lu.assertEquals( allTests, {"MyTestFunction", "MyTestOk", "MyTestToto1", "MyTestToto2","MyTestWithErrorsAndFailures"})
+        lu.assertEquals( allTests,
+            {"MyTestFunction", "MyTestOk", "MyTestSkipped",
+             "MyTestToto1", "MyTestToto2","MyTestWithErrorsAndFailures"})
     end
 
     function TestLuaUnitExecution:test_MethodsAreExecutedInRightOrder()
@@ -2755,8 +2807,9 @@ TestLuaUnitResults = { __class__ = 'TestLuaUnitResults' }
     function TestLuaUnitResults:test_runSuiteOk()
         local runner = lu.LuaUnit.new()
         runner:setOutputType( "NIL" )
-        runner:runSuiteByNames( { 'MyTestToto2', 'MyTestToto1', 'MyTestFunction' } )
-        lu.assertEquals( #runner.result.tests, 7 )
+        runner:runSuiteByNames( { 'MyTestToto2', 'MyTestToto1', 'MyTestFunction',
+                                  'MyTestSkipped' } )
+        lu.assertEquals( #runner.result.tests, 9 )
         lu.assertEquals( #runner.result.notPassed, 0 )
 
         lu.assertEquals( runner.result.tests[1].testName,"MyTestToto2.test1" )
@@ -2794,6 +2847,17 @@ TestLuaUnitResults = { __class__ = 'TestLuaUnitResults' }
         lu.assertEquals( runner.result.tests[7].className, '[TestFunctions]' )
         lu.assertEquals( runner.result.tests[7].status,  lu.NodeStatus.PASS )
 
+        lu.assertEquals( runner.result.tests[8].testName,"MyTestSkipped.test1" )
+        lu.assertEquals( runner.result.tests[8].number, 8)
+        lu.assertEquals( runner.result.tests[8].className, 'MyTestSkipped' )
+        lu.assertEquals( runner.result.tests[8].status, lu.NodeStatus.SKIPPED )
+        lu.assertStrContains( runner.result.tests[8].msg, 'Test skipped conditionally.')
+
+        lu.assertEquals( runner.result.tests[9].testName,"MyTestSkipped.test2" )
+        lu.assertEquals( runner.result.tests[9].number, 9)
+        lu.assertEquals( runner.result.tests[9].className, 'MyTestSkipped' )
+        lu.assertEquals( runner.result.tests[9].status, lu.NodeStatus.SKIPPED )
+        lu.assertStrContains( runner.result.tests[9].msg, 'Test skipped.')
     end
 
     function TestLuaUnitResults:test_runSuiteWithFailures()
