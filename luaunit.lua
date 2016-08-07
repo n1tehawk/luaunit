@@ -2377,6 +2377,9 @@ end
                           result.runCount, result.duration),
             conditional_plural(result.passedCount, 'success'),
         }
+        if result.skippedCount > 0 then
+            table.insert(s, string.format("%d skipped", result.skippedCount))
+        end
         if result.notPassedCount > 0 then
             if result.failureCount > 0 then
                 table.insert(s, conditional_plural(result.failureCount, 'failure'))
@@ -2397,6 +2400,7 @@ end
         self.result = {
             testCount = testCount,
             nonSelectedCount = nonSelectedCount,
+            skippedCount = 0,
             passedCount = 0,
             runCount = 0,
             currentTestNumber = 0,
@@ -2467,6 +2471,7 @@ end
             node:error( err.msg, err.trace )
             table.insert( self.result.errors, node )
         elseif err.status == NodeStatus.SKIPPED then
+            self.result.skippedCount = self.result.skippedCount + 1
             node:skipped( err.msg, err.trace )
         end
 
