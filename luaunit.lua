@@ -1690,12 +1690,20 @@ TapOutput.__class__ = 'TapOutput'
     end
 
     function TapOutput:addStatus( node )
-        io.stdout:write("not ok ", self.result.currentTestNumber, "\t", node.testName, "\n")
-        if self.verbosity > M.VERBOSITY_LOW then
-           print( prefixString( '    ', node.msg ) )
-        end
-        if self.verbosity > M.VERBOSITY_DEFAULT then
-           print( prefixString( '    ', node.stackTrace ) )
+        if node:isSkipped() then
+            -- the TAP specification shows a skipped test should report "ok"
+            -- combined with a "# SKIP" directive containing the reason/message
+            io.stdout:write("ok     ", self.result.currentTestNumber, "\t",
+                            node.testName, " # SKIP ", node.msg, "\n")
+        else
+            io.stdout:write("not ok ", self.result.currentTestNumber, "\t",
+                            node.testName, "\n")
+            if self.verbosity > M.VERBOSITY_LOW then
+               print( prefixString( '    ', node.msg ) )
+            end
+            if self.verbosity > M.VERBOSITY_DEFAULT then
+               print( prefixString( '    ', node.stackTrace ) )
+            end
         end
     end
 
@@ -2243,9 +2251,10 @@ end
     M.NodeStatus = NodeStatus
 
     -- values of status
-    NodeStatus.PASS  = 'PASS'
-    NodeStatus.FAIL  = 'FAIL'
-    NodeStatus.ERROR = 'ERROR'
+    NodeStatus.PASS    = 'PASS'
+    NodeStatus.FAIL    = 'FAIL'
+    NodeStatus.ERROR   = 'ERROR'
+    NodeStatus.SKIPPED = 'SKIPPED'
 
     function NodeStatus.new( number, testName, className )
         local t = { number = number, testName = testName, className = className }
@@ -2273,6 +2282,14 @@ end
         self.stackTrace = stackTrace
     end
 
+    function NodeStatus:skipped(msg, stackTrace)
+        self.status = self.SKIPPED
+        self.msg = msg
+        -- We assume that the one-line "skipped" message (including line number)
+        -- is sufficient information, so don't include a full stack trace.
+        self.stackTrace = nil
+    end
+
     function NodeStatus:isPassed()
         return self.status == NodeStatus.PASS
     end
@@ -2290,6 +2307,10 @@ end
         return self.status == NodeStatus.ERROR
     end
 
+    function NodeStatus:isSkipped()
+        return self.status == NodeStatus.SKIPPED
+    end
+
     function NodeStatus:statusXML()
         if self:isError() then
             return table.concat(
@@ -2301,6 +2322,14 @@ end
                 {'            <failure type="', xmlEscape(self.msg), '">\n',
                  '                <![CDATA[', xmlCDataEscape(self.stackTrace),
                  ']]></failure>\n'})
+        elseif self:isSkipped() then
+            -- The problem here is that the Apache Ant JUnit schema does _not_
+            -- provide any way to report skipped/ignored tests. To pass XSD
+            -- validation, we therefore convert the "skipped" status into a
+            -- suitable XML comment...
+            return table.concat(
+                {'            <!-- <skipped>', xmlEscape(self.msg),
+                 '</skipped> -->\n'})
         end
         return '            <passed/>\n' -- (not XSD-compliant! normally shouldn't get here)
     end
