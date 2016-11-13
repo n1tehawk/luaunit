@@ -255,27 +255,33 @@ local function check_xml_output( fileToRun, options, output, xmlOutput, xmlLintO
 
     if HAS_XMLLINT then
         -- General xmllint validation
-        if osExec('xmllint --noout %s > %s', xmlOutput, xmlLintOutput) then
-            -- report('XMLLint validation ok: file %s', xmlLintOutput)
-        else
+        if not osExec('xmllint --noout %s > %s', xmlOutput, xmlLintOutput) then
             error_fmt('XMLLint reported errors : file %s', xmlLintOutput)
             retcode = retcode + 1
+        --[[
+        else
+            report('XMLLint validation ok: file %s', xmlLintOutput)
+        --]]
         end
 
         -- Validation against apache junit schema
-        if osExec('xmllint --noout --schema junitxml/junit-apache-ant.xsd %s 2> %s', xmlOutput, xmlLintOutput) then
-            -- report('XMLLint validation ok: file %s', xmlLintOutput)
-        else
+        if not osExec('xmllint --noout --schema junitxml/junit-apache-ant.xsd %s 2> %s', xmlOutput, xmlLintOutput) then
             error_fmt('XMLLint reported errors against apache schema: file %s', xmlLintOutput)
             retcode = retcode + 1
+        --[[
+        else
+            report('XMLLint validation ok: file %s', xmlLintOutput)
+        --]]
         end
 
         -- Validation against jenkins/hudson schema
-        if osExec('xmllint --noout --schema junitxml/junit-jenkins.xsd %s 2> %s', xmlOutput, xmlLintOutput) then
-            -- report('XMLLint validation ok: file %s', xmlLintOutput)
-        else
+        if not osExec('xmllint --noout --schema junitxml/junit-jenkins.xsd %s 2> %s', xmlOutput, xmlLintOutput) then
             error_fmt('XMLLint reported errors against jenkins schema: file %s', xmlLintOutput)
             retcode = retcode + 1
+        --[[
+        else
+            report('XMLLint validation ok: file %s', xmlLintOutput)
+        --]]
         end
     end
 

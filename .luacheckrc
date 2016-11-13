@@ -17,7 +17,6 @@ ignore = {
     "411", -- redefinition of variable
     "421", -- shadowing definition of variable
     "431", -- shadowing upvalue
-    "542", -- empty if branch
     "61[124]", -- ignore whitespace issues
     "631", -- line too long
     "[Tt]est[%w_]+" -- expect test cases to be defined / accessed as globals
