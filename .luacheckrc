@@ -5,6 +5,7 @@ Thanks to Peter Melnichenko for providing an example file for LuaUnit.
 ]]
 
 only = {"1"} -- limit checks to the use of global variables
+codes = true
 std = "max"
 self = false
 ignore = {"[Tt]est[%w_]+"}
@@ -14,13 +15,13 @@ files = {
         globals = {"EXPORT_ASSERT_TO_GLOBALS", "LuaUnit"},
     },
     ["test/compat_luaunit_v2x.lua"] = {
-        ignore = {"EXPORT_ASSERT_TO_GLOBALS", "assert[%w_]+", "v", "y"}
+        ignore = {"EXPORT_ASSERT_TO_GLOBALS", "assert[%w_]+"}
     },
     ["test/legacy_example_with_luaunit.lua"] = {
         ignore = {"LuaUnit", "EXPORT_ASSERT_TO_GLOBALS",
         "assertEquals", "assertNotEquals", "assertTrue", "assertFalse"}
     },
     ["test/test_luaunit.lua"] = {
-        ignore = {"TestMock", "TestLuaUnit%a+", "MyTest%w+", "v", "y" } 
+        ignore = {"MyTest%w+"}
     }
 }
