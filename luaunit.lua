@@ -1910,19 +1910,15 @@ TextOutput.__class__ = 'TextOutput'
         end
     end
 
-    function TextOutput:displayOneFailedTest( index, fail )
-        print(index..") "..fail.testName )
-        print( fail.msg )
-        print( fail.stackTrace )
-        print()
-    end
-
     function TextOutput:displayFailedTests()
         if self.result.notPassedCount ~= 0 then
             print("Failed tests:")
             print("-------------")
-            for i, v in ipairs(self.result.notPassed) do
-                self:displayOneFailedTest(i, v)
+            for index, fail in ipairs(self.result.notPassed) do
+                print( index..") "..fail.testName )
+                print( fail.msg )
+                print( fail.stackTrace )
+                print()
             end
         end
     end
