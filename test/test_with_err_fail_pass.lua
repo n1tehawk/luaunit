@@ -20,11 +20,11 @@ TestSomething = {} --class
     end
 
     function TestSomething:test3_Err1()
-        local v = 1 + { 1,2 }
+        return 1 + { 1,2 }
     end
 
     function TestSomething:test3_Err2()
-        local v = 1 + { 1,2 }
+        return 1 + { 1,2 }
     end
 
 TestAnotherThing = {} --class
@@ -38,11 +38,11 @@ TestAnotherThing = {} --class
     end
 
     function TestAnotherThing:test2_Err1()
-        local v = 1 + { 1,2 }
+        return 1 + { 1,2 }
     end
 
     function TestAnotherThing:test2_Err2()
-        local v = 1 + { 1,2 }
+        return 1 + { 1,2 }
     end
 
     function TestAnotherThing:test3_Fail1()
@@ -63,7 +63,7 @@ function testFuncFail1()
 end
 
 function testFuncErr1()
-    local v = 1 + { 1,2 }
+    return 1 + { 1,2 }
 end
 
 local runner = lu.LuaUnit.new()
