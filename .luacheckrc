@@ -4,11 +4,10 @@ Luacheck configuration
 Thanks to Peter Melnichenko for providing an example file for LuaUnit.
 ]]
 
-only = {"1"} -- limit checks to the use of global variables
 codes = true
 std = "max"
 self = false
-ignore = {"[Tt]est[%w_]+"}
+ignore = {"[Tt]est[%w_]+", "21[23]", "6.."}
 
 files = {
     ["luaunit.lua"] = {

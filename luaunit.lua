@@ -806,7 +806,7 @@ local function _table_tostring( tbl, indentLevel, keeponeline, printTableRefs, r
         return prettystr_sub(k, indentLevel+1, true, printTableRefs, recursionTable)
     end
 
-    local entry, count, seq_index = nil, 0, 1
+    local count, seq_index, entry = 0, 1
     for k, v in sortedPairs( tbl ) do
         if k == seq_index then
             -- for the sequential part of tables, we'll skip the "<key>=" output
@@ -2085,7 +2085,7 @@ end
             error('Unknown option: '..option,3)
         end
 
-        local function setArg( cmdArg, state )
+        local function setArg( cmdArg )
             if state == SET_OUTPUT then
                 result['output'] = cmdArg
                 return
