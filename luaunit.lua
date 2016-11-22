@@ -1981,7 +1981,10 @@ TextOutput.__class__ = 'TextOutput'
             end
         else
             if self.verbosity > M.VERBOSITY_DEFAULT then
-                print( COLOR.red .. node.status .. COLOR.reset )
+                if not node:isSkipped() then
+                    io.stdout:write(COLOR.red)
+                end
+                print( node.status .. COLOR.reset )
                 print( COLOR.bright .. node.msg )
                 --[[
                 -- find out when to do this:
