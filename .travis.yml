@@ -33,8 +33,8 @@ before_install:
   - luarocks install luacov-coveralls
 
 script: 
-  - lua -v -lluacov run_unit_tests.lua --random
-  - lua run_functional_tests.lua --coverage
+  - lua -v -lluacov run_unit_tests.lua --random --color
+  - lua run_functional_tests.lua --coverage --color
   - luacheck *.lua test/
 
 after_success:
