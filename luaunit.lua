@@ -654,24 +654,23 @@ local function mismatchFormattingMapping( table_a, table_b, doDeepAnalysis )
 end
 M.private.mismatchFormattingMapping = mismatchFormattingMapping
 
-local function mismatchFormattingPureList( table_a, table_b )
+local function list_compare( table_a, table_b )
     --[[
-    Prepares a nice error message when comparing tables which are lists, performing a deeper 
-    analysis.
+    Helper function for comparison of two "list-type" (i.e. sequential) tables
 
-    Returns: {success, result}
-    * success: false if deep analysis could not be performed 
-               in this case, just use standard assertion message
-    * result: if success is true, a multi-line string with deep analysis of the two lists
+    The function works out how many elements are equal at the beginning of both
+    tables (commonUntil), and how many at the end (commonBackTo). commonUntil
+    may turn out zero. If there are no common elements at the end, commonBackTo
+    ends up as -1; otherwise you know that fields [shortest - commonBackTo] up
+    to [shortest] and [longest - commonBackTo] up to [longest] are identical
+    (in the shorter / longer of the two tables, respectively).
+
+    Return values are len_a (length of table_a), len_b (length of table_b),
+    longest (maximum length), shortest (minimum length), delta (the difference
+    in length between longest and shortest), commonUntil and commonBackTo.
     ]]
-    local result, descrTa, descrTb = {}, getTaTbDescr()
-
-    local len_a, len_b, refa, refb = #table_a, #table_b, '', ''
-    if M.PRINT_TABLE_REF_IN_ERROR_MSG then
-        refa, refb = string.format( '<%s> ', tostring(table_a)), string.format('<%s> ', tostring(table_b) )
-    end
+    local len_a, len_b = #table_a, #table_b
     local longest, shortest = math.max(len_a, len_b), math.min(len_a, len_b)
-    local deltalv  = longest - shortest
 
     local commonUntil = longest
     for i = 1, longest do
@@ -689,6 +688,27 @@ local function mismatchFormattingPureList( table_a, table_b )
         end
     end
 
+    return len_a, len_b, longest, shortest, longest - shortest,
+           commonUntil, commonBackTo
+end
+
+local function mismatchFormattingPureList( table_a, table_b )
+    --[[
+    Prepares a nice error message when comparing tables which are lists, performing a deeper 
+    analysis.
+
+    Returns: {success, result}
+    * success: false if deep analysis could not be performed 
+               in this case, just use standard assertion message
+    * result: if success is true, a multi-line string with deep analysis of the two lists
+    ]]
+    local result, refa, refb, descrTa, descrTb = {}, '', '', getTaTbDescr()
+    if M.PRINT_TABLE_REF_IN_ERROR_MSG then
+        refa, refb = string.format( '<%s> ', tostring(table_a)), string.format('<%s> ', tostring(table_b) )
+    end
+
+    local len_a, len_b, longest, shortest, deltalv, commonUntil, commonBackTo
+          = list_compare(table_a, table_b)
 
     table.insert( result, 'List difference analysis:' )    
     if len_a == len_b then
