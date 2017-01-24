@@ -905,48 +905,43 @@ local function table_keyof(t, element)
     return nil
 end
 
---[[
--- this function is basically superseded by ( table_keyof(t, element) ~= nil )
-
-local function _table_contains(t, element)
-    if type(t) == "table" then
-        local type_e = type(element)
-        for _, value in pairs(t) do
-            if type(value) == type_e then
-                if value == element then
-                    return true
-                end
-                if type_e == 'table' then
-                    -- if we wanted recursive items content comparison, we could use
-                    -- _is_table_items_equals(v, expected) but one level of just comparing
-                    -- items is sufficient
-                    if M.private._is_table_equals( value, element ) then
-                        return true
-                    end
-                end
-            end
-        end
+local function table_copy(t)
+    -- Create a copy of t,
+    -- so that assigning to the clone won't affect the original table
+    local result = {}
+    for k, v in pairs(t) do
+        result[k] = v
     end
-    return false
+    return result
 end
---]]
 
 local function _is_table_items_equals(actual, expected )
+    -- Check that actual and expected represent the same items. Mainly intended
+    -- for comparison of table elements while disregarding their specific keys
+    -- (indices, "position").
+    -- i.e. _is_table_items_equals({1,2,3}, {3,1,2}) == true
+
     local type_a, type_e = type(actual), type(expected)
 
     if type_a ~= type_e then
         return false
 
     elseif (type_a == 'table') --[[and (type_e == 'table')]] then
-        for k, v in pairs(actual) do
-            if table_keyof(expected, v) == nil then
-                return false -- v not contained in expected
-            end
-        end
+        -- Make sure that each and every element of expected is present in actual.
+        -- To ensure that each member of actual can only be matched once, we'll
+        -- work on a copy of the table, eliminating elements as we go.
+        local search_set = table_copy(actual)
         for k, v in pairs(expected) do
-            if table_keyof(actual, v) == nil then
+            local matched = table_keyof(search_set, v) -- matching key
+            if matched == nil then
                 return false -- v not contained in actual
             end
+            search_set[matched] = nil -- remove element
+        end
+        -- If we have any remaining elements in the search set,
+        -- the match was unsuccessful.
+        if next(search_set) then
+            return false -- (values present in actual, but not in expected)
         end
         return true
 

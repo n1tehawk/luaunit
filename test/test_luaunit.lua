@@ -1202,10 +1202,10 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertItemsEquals, {one=1,two=2,three=3}, {two=2,one=1,nil})
         assertFailure(lu.assertItemsEquals, {one=1,two=2,three=3}, {two=2,one=1})
 
-        -- assertItemsEquals does _NOT_ care for actual count of each element
+        -- assertItemsEquals DOES care for actual count of each element
         lu.assertItemsEquals({1,2,1,3}, {3,1,2,1})
-        lu.assertItemsEquals({1,2,3,3}, {3,1,2,1})
-        lu.assertItemsEquals({2,1,2,3,1}, {3,1,2,1})
+        assertFailure(lu.assertItemsEquals, {1,2,3,3}, {3,1,2,1})
+        assertFailure(lu.assertItemsEquals, {2,1,2,3,1}, {3,1,2,1})
     end
 
     function TestLuaUnitAssertions:test_assertIsNumber()
