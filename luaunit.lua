@@ -890,6 +890,24 @@ local function _table_tostring( tbl, indentLevel, keeponeline, printTableRefs, r
 end
 M.private._table_tostring = _table_tostring -- prettystr_sub() needs it
 
+local function table_keyof(t, element)
+    -- Return the key k of the given element in table t, so that t[k] == element
+    -- (or `nil` if element is not present within t). Note that we use our
+    -- 'general' is_equal comparison for matching, so this function should
+    -- handle table-type elements gracefully and consistently.
+    if type(t) == "table" then
+        for k, v in pairs(t) do
+            if is_equal(v, element) then
+                return k
+            end
+        end
+    end
+    return nil
+end
+
+--[[
+-- this function is basically superseded by ( table_keyof(t, element) ~= nil )
+
 local function _table_contains(t, element)
     if type(t) == "table" then
         local type_e = type(element)
@@ -911,25 +929,26 @@ local function _table_contains(t, element)
     end
     return false
 end
+--]]
 
 local function _is_table_items_equals(actual, expected )
     local type_a, type_e = type(actual), type(expected)
 
-    if (type_a == 'table') and (type_e == 'table') then
+    if type_a ~= type_e then
+        return false
+
+    elseif (type_a == 'table') --[[and (type_e == 'table')]] then
         for k, v in pairs(actual) do
-            if not _table_contains(expected, v) then
-                return false
+            if table_keyof(expected, v) == nil then
+                return false -- v not contained in expected
             end
         end
         for k, v in pairs(expected) do
-            if not _table_contains(actual, v) then
-                return false
+            if table_keyof(actual, v) == nil then
+                return false -- v not contained in actual
             end
         end
         return true
-
-    elseif type_a ~= type_e then
-        return false
 
     elseif actual ~= expected then
         return false
