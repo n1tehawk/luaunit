@@ -12,8 +12,6 @@ ignore = {
     "211", -- unused variable
     "212", -- unused argument
     "213", -- unused loop variable
-    "231", -- variable is never accessed
-    "311", -- value assigned to variable is unused
     "411", -- redefinition of variable
     "421", -- shadowing definition of variable
     "431", -- shadowing upvalue

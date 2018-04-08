@@ -915,7 +915,7 @@ local function _table_tostring( tbl, indentLevel, printTableRefs, recursionTable
     else
         -- no metatable, compute the table representation
 
-        local entry, count, seq_index = nil, 0, 1
+        local count, seq_index, entry = 0, 1
         for k, v in sortedPairs( tbl ) do
 
             -- key part

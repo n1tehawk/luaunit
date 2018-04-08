@@ -118,9 +118,9 @@ local function adjustFile( fileOut, fileIn, pattern, mayBeAbsent, verbose )
 
     In most cases, pattern2 may be nil in which case, pattern is used when matching in fileout.
     ]]
-    local source, idxStart, idxEnd, capture = nil
+    local source, idxStart, idxEnd, capture, _
     for line in io.lines(fileIn) do
-        idxStart, idxEnd, capture = line:find( pattern )
+        idxStart, _, capture = line:find( pattern )
         if idxStart ~= nil then
             if capture == nil then
                 error_fmt('Must specify a capture for pattern %s in function adjustFile()', pattern)
@@ -681,11 +681,10 @@ local filesSetIndex = {
 }
 
 local function updateRefFiles( filesToGenerate )
-    local ret
-
     for _,v in ipairs(filesToGenerate) do 
         report('Generating '..v[4])
-        ret = osExec( '%s %s %s %s > %s', LUA, v[1], v[2], v[3], v[4] )
+        --local ret =
+        osExec( '%s %s %s %s > %s', LUA, v[1], v[2], v[3], v[4] )
         --[[
         -- exitcode != 0 is not an error for us ...
         if ret == false then
