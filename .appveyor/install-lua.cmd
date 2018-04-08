@@ -4,7 +4,7 @@ REM It is intended to be run as "install" step from within AppVeyor.
 REM version numbers and file names for binaries from http://sf.net/p/luabinaries/
 set VER_51=5.1.5
 set VER_52=5.2.4
-set VER_53=5.3.3
+set VER_53=5.3.4
 set ZIP_51=lua-%VER_51%_Win32_bin.zip
 set ZIP_52=lua-%VER_52%_Win32_bin.zip
 set ZIP_53=lua-%VER_53%_Win32_bin.zip
@@ -78,7 +78,7 @@ goto :EOF
 if NOT "%LUAENV%"=="luajit20" goto luajit21
 echo Setting up LuaJIT 2.0 ...
 if NOT EXIST "luajit20\luajit.exe" (
-    call %~dp0install-luajit.cmd LuaJIT-2.0.4 luajit20
+    call %~dp0install-luajit.cmd LuaJIT-2.0.5 luajit20
 ) else (
     echo Using cached version of LuaJIT 2.0
 )
@@ -88,7 +88,7 @@ goto :EOF
 :luajit21
 echo Setting up LuaJIT 2.1 ...
 if NOT EXIST "luajit21\luajit.exe" (
-    call %~dp0install-luajit.cmd LuaJIT-2.1.0-beta2 luajit21
+    call %~dp0install-luajit.cmd LuaJIT-2.1.0-beta3 luajit21
 ) else (
     echo Using cached version of LuaJIT 2.1
 )
