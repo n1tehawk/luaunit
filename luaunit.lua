@@ -1618,91 +1618,131 @@ end
 --              Scientific assertions
 ------------------------------------------------------------------
 
+local function _isNaN(value) -- "not a number"
+    if type(value) ~= "number" then
+        return false
+    end
+    return value ~= value
+end
+
+local function _isInf(value) -- infinite (regardless of sign)
+    if type(value) ~= "number" then
+        return false
+    end
+    return math.abs(value) == math.huge
+end
+
+local function _isPlusInf(value) -- positive infinity
+    if type(value) ~= "number" then
+        return false
+    end
+    return value == math.huge
+end
+
+local function _isMinusInf(value) -- negative infinity
+    if type(value) ~= "number" then
+        return false
+    end
+    return value == -math.huge
+end
+
+local function _isPlusZero(value)
+    if type(value) ~= "number" then
+        return false
+    end
+    if value ~= 0 then
+        return false
+    end
+    return 1/value == math.huge
+end
+
+local function _isMinusZero(value)
+    if type(value) ~= "number" then
+        return false
+    end
+    if value ~= 0 then
+        return false
+    end
+    return 1/value == -math.huge
+end
+
 
 function M.assertIsNaN(value, extra_msg_or_nil)
-    if type(value) ~= "number" or value == value then
+    if not _isNaN(value) then
         failure("expected: NaN, actual: " ..prettystr(value), extra_msg_or_nil, 2)
     end
 end
 
 function M.assertNotIsNaN(value, extra_msg_or_nil)
-    if type(value) == "number" and value ~= value then
+    if _isNaN(value) then
         failure("expected: not NaN, actual: NaN", extra_msg_or_nil, 2)
     end
 end
 
 function M.assertIsInf(value, extra_msg_or_nil)
-    if type(value) ~= "number" or math.abs(value) ~= math.huge then
+    if not _isInf(value) then
         failure("expected: #Inf, actual: " ..prettystr(value), extra_msg_or_nil, 2)
     end
 end
 
 function M.assertIsPlusInf(value, extra_msg_or_nil)
-    if type(value) ~= "number" or value ~= math.huge then
+    if not _isPlusInf(value) then
         failure("expected: #Inf, actual: " ..prettystr(value), extra_msg_or_nil, 2)
     end
 end
 
 function M.assertIsMinusInf(value, extra_msg_or_nil)
-    if type(value) ~= "number" or value ~= -math.huge then
+    if not _isMinusInf(value) then
         failure("expected: -#Inf, actual: " ..prettystr(value), extra_msg_or_nil, 2)
     end
 end
 
 function M.assertNotIsPlusInf(value, extra_msg_or_nil)
-    if type(value) == "number" and value == math.huge then
+    if _isPlusInf(value) then
         failure("expected: not #Inf, actual: #Inf", extra_msg_or_nil, 2)
     end
 end
 
 function M.assertNotIsMinusInf(value, extra_msg_or_nil)
-    if type(value) == "number" and value == -math.huge then
+    if _isMinusInf(value) then
         failure("expected: not -#Inf, actual: -#Inf", extra_msg_or_nil, 2)
     end
 end
 
 function M.assertNotIsInf(value, extra_msg_or_nil)
-    if type(value) == "number" and math.abs(value) == math.huge then
+    if _isInf(value) then
         failure("expected: not infinity, actual: " .. prettystr(value), extra_msg_or_nil, 2)
     end
 end
 
 function M.assertIsPlusZero(value, extra_msg_or_nil)
-    if type(value) ~= 'number' or value ~= 0 then
+    if _isMinusZero(value) then
+        -- more precise error diagnosis
+        failure("expected: +0.0, actual: -0.0", extra_msg_or_nil, 2)
+    end
+    if not _isPlusZero(value) then
         failure("expected: +0.0, actual: " ..prettystr(value), extra_msg_or_nil, 2)
-    else if (1/value == -math.huge) then
-            -- more precise error diagnosis
-            failure("expected: +0.0, actual: -0.0", extra_msg_or_nil, 2)
-        else if (1/value ~= math.huge) then
-                -- strange, case should have already been covered
-                failure("expected: +0.0, actual: " ..prettystr(value), extra_msg_or_nil, 2)
-            end
-        end
     end
 end
 
 function M.assertIsMinusZero(value, extra_msg_or_nil)
-    if type(value) ~= 'number' or value ~= 0 then
+    if _isPlusZero(value) then
+        -- more precise error diagnosis
+        failure("expected: -0.0, actual: +0.0", extra_msg_or_nil, 2)
+    end
+    if not _isMinusZero(value) then
         failure("expected: -0.0, actual: " ..prettystr(value), extra_msg_or_nil, 2)
-    else if (1/value == math.huge) then
-            -- more precise error diagnosis
-            failure("expected: -0.0, actual: +0.0", extra_msg_or_nil, 2)
-        else if (1/value ~= -math.huge) then
-                -- strange, case should have already been covered
-                failure("expected: -0.0, actual: " ..prettystr(value), extra_msg_or_nil, 2)
-            end
-        end
     end
 end
 
 function M.assertNotIsPlusZero(value, extra_msg_or_nil)
-    if type(value) == 'number' and (1/value == math.huge) then
+    if _isPlusZero(value) then
         failure("expected: not +0.0, actual: +0.0", extra_msg_or_nil, 2)
     end
 end
 
 function M.assertNotIsMinusZero(value, extra_msg_or_nil)
-    if type(value) == 'number' and (1/value == -math.huge) then
+    if _isMinusZero(value) then
         failure("expected: not -0.0, actual: -0.0", extra_msg_or_nil, 2)
     end
 end
