@@ -84,7 +84,6 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
 
     function TestLuaUnitUtilities:test_sortedNextWorks()
         local t1 = {}
-        local _
         t1['aaa'] = 'abc'
         t1['ccc'] = 'def'
         t1['bbb'] = 'cba'
@@ -1350,7 +1349,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsNumber, {})
         assertFailure(lu.assertIsNumber, {1,2,3})
         assertFailure(lu.assertIsNumber, {1})
-        assertFailure(lu.assertIsNumber, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsNumber, coroutine.create( function(v) return v+1 end ) )
         assertFailure(lu.assertIsNumber, true)
     end
 
@@ -1360,7 +1359,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsNaN, {})
         assertFailure(lu.assertIsNaN, {1,2,3})
         assertFailure(lu.assertIsNaN, {1})
-        assertFailure(lu.assertIsNaN, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsNaN, coroutine.create( function(v) return v+1 end ) )
         lu.assertIsNaN(0 / 0)
         lu.assertIsNaN(-0 / 0)
         lu.assertIsNaN(0 / -0)
@@ -1398,7 +1397,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsNaN( {})
         lu.assertNotIsNaN( {1,2,3})
         lu.assertNotIsNaN( {1})
-        lu.assertNotIsNaN( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsNaN( coroutine.create( function(v) return v+1 end ) )
 
         -- is NaN
         lu.assertFailure( lu.assertNotIsNaN, 0 / 0)
@@ -1439,7 +1438,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsInf, {})
         assertFailure(lu.assertIsInf, {1,2,3})
         assertFailure(lu.assertIsInf, {1})
-        assertFailure(lu.assertIsInf, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsInf, coroutine.create( function(v) return v+1 end ) )
 
         assertFailure(lu.assertIsInf, 0 )
         assertFailure(lu.assertIsInf, 1 )
@@ -1459,7 +1458,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsPlusInf, {})
         assertFailure(lu.assertIsPlusInf, {1,2,3})
         assertFailure(lu.assertIsPlusInf, {1})
-        assertFailure(lu.assertIsPlusInf, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsPlusInf, coroutine.create( function(v) return v+1 end ) )
 
         assertFailure(lu.assertIsPlusInf, 0 )
         assertFailure(lu.assertIsPlusInf, 1 )
@@ -1492,7 +1491,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsMinusInf, {})
         assertFailure(lu.assertIsMinusInf, {1,2,3})
         assertFailure(lu.assertIsMinusInf, {1})
-        assertFailure(lu.assertIsMinusInf, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsMinusInf, coroutine.create( function(v) return v+1 end ) )
 
         assertFailure(lu.assertIsMinusInf, 0 )
         assertFailure(lu.assertIsMinusInf, 1 )
@@ -1527,7 +1526,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsInf( {})
         lu.assertNotIsInf( {1,2,3})
         lu.assertNotIsInf( {1})
-        lu.assertNotIsInf( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsInf( coroutine.create( function(v) return v+1 end ) )
 
         -- not inf
         lu.assertNotIsInf( 0 )
@@ -1550,7 +1549,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsPlusInf( {})
         lu.assertNotIsPlusInf( {1,2,3})
         lu.assertNotIsPlusInf( {1})
-        lu.assertNotIsPlusInf( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsPlusInf( coroutine.create( function(v) return v+1 end ) )
 
         lu.assertNotIsPlusInf( 0 )
         lu.assertNotIsPlusInf( 1 )
@@ -1573,7 +1572,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsMinusInf( {})
         lu.assertNotIsMinusInf( {1,2,3})
         lu.assertNotIsMinusInf( {1})
-        lu.assertNotIsMinusInf( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsMinusInf( coroutine.create( function(v) return v+1 end ) )
 
         lu.assertNotIsMinusInf( 0 )
         lu.assertNotIsMinusInf( 1 )
@@ -1673,7 +1672,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsPlusZero, {})
         assertFailure(lu.assertIsPlusZero, {1,2,3})
         assertFailure(lu.assertIsPlusZero, {1})
-        assertFailure(lu.assertIsPlusZero, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsPlusZero, coroutine.create( function(v) return v+1 end ) )
 
         local inf = 1/0
         assertFailure(lu.assertIsPlusZero, 1 )
@@ -1703,7 +1702,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsPlusZero( {})
         lu.assertNotIsPlusZero( {1,2,3})
         lu.assertNotIsPlusZero( {1})
-        lu.assertNotIsPlusZero( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsPlusZero( coroutine.create( function(v) return v+1 end ) )
 
         local inf = 1/0
         lu.assertNotIsPlusZero( 1 )
@@ -1734,7 +1733,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsMinusZero, {})
         assertFailure(lu.assertIsMinusZero, {1,2,3})
         assertFailure(lu.assertIsMinusZero, {1})
-        assertFailure(lu.assertIsMinusZero, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsMinusZero, coroutine.create( function(v) return v+1 end ) )
 
         local inf = 1/0
         assertFailure(lu.assertIsMinusZero, 1 )
@@ -1764,7 +1763,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsMinusZero( {})
         lu.assertNotIsMinusZero( {1,2,3})
         lu.assertNotIsMinusZero( {1})
-        lu.assertNotIsMinusZero( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsMinusZero( coroutine.create( function(v) return v+1 end ) )
 
         local inf = 1/0
         lu.assertNotIsMinusZero( 1 )
@@ -1795,7 +1794,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsString, {})
         assertFailure(lu.assertIsString, {1,2,3})
         assertFailure(lu.assertIsString, {1})
-        assertFailure(lu.assertIsString, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsString, coroutine.create( function(v) return v+1 end ) )
         assertFailure(lu.assertIsString, true)
     end
 
@@ -1808,7 +1807,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertIsTable({1,2,3})
         lu.assertIsTable({1})
         assertFailure(lu.assertIsTable, true)
-        assertFailure(lu.assertIsTable, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsTable, coroutine.create( function(v) return v+1 end ) )
     end
 
     function TestLuaUnitAssertions:test_assertIsBoolean()
@@ -1819,7 +1818,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsBoolean, {})
         assertFailure(lu.assertIsBoolean, {1,2,3})
         assertFailure(lu.assertIsBoolean, {1})
-        assertFailure(lu.assertIsBoolean, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsBoolean, coroutine.create( function(v) return v+1 end ) )
         lu.assertIsBoolean(true)
         lu.assertIsBoolean(false)
     end
@@ -1833,7 +1832,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsNil, {1,2,3})
         assertFailure(lu.assertIsNil, {1})
         assertFailure(lu.assertIsNil, false)
-        assertFailure(lu.assertIsNil, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsNil, coroutine.create( function(v) return v+1 end ) )
     end
 
     function TestLuaUnitAssertions:test_assertIsFunction()
@@ -1847,7 +1846,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsFunction, {1,2,3})
         assertFailure(lu.assertIsFunction, {1})
         assertFailure(lu.assertIsFunction, false)
-        assertFailure(lu.assertIsFunction, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsFunction, coroutine.create( function(v) return v+1 end ) )
         lu.assertIsFunction(f)
     end
 
@@ -1860,8 +1859,8 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsThread, {1,2,3})
         assertFailure(lu.assertIsThread, {1})
         assertFailure(lu.assertIsThread, false)
-        assertFailure(lu.assertIsThread, function(v) local y=v+1 end )
-        lu.assertIsThread(coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsThread, function(v) return v+1 end )
+        lu.assertIsThread(coroutine.create( function(v) return v+1 end ) )
     end
 
     function TestLuaUnitAssertions:test_assertIsUserdata()
@@ -1873,8 +1872,8 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure(lu.assertIsUserdata, {1,2,3})
         assertFailure(lu.assertIsUserdata, {1})
         assertFailure(lu.assertIsUserdata, false)
-        assertFailure(lu.assertIsUserdata, function(v) local y=v+1 end )
-        assertFailure(lu.assertIsUserdata, coroutine.create( function(v) local y=v+1 end ) )
+        assertFailure(lu.assertIsUserdata, function(v) return v+1 end )
+        assertFailure(lu.assertIsUserdata, coroutine.create( function(v) return v+1 end ) )
     end
 
     function TestLuaUnitAssertions:test_assertNotIsNumber()
@@ -1885,7 +1884,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsNumber( {})
         lu.assertNotIsNumber( {1,2,3})
         lu.assertNotIsNumber( {1})
-        lu.assertNotIsNumber( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsNumber( coroutine.create( function(v) return v+1 end ) )
         lu.assertNotIsNumber( true)
     end
 
@@ -1895,7 +1894,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsNaN( {} )
         lu.assertNotIsNaN( {1,2,3} )
         lu.assertNotIsNaN( {1} )
-        lu.assertNotIsNaN( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsNaN( coroutine.create( function(v) return v+1 end ) )
         assertFailure(lu.assertNotIsNaN, 0 / 0)
         assertFailure(lu.assertNotIsNaN, -0 / 0)
         assertFailure(lu.assertNotIsNaN, 0 / -0)
@@ -1931,7 +1930,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsInf( {})
         lu.assertNotIsInf( {1,2,3})
         lu.assertNotIsInf( {1})
-        lu.assertNotIsInf( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsInf( coroutine.create( function(v) return v+1 end ) )
         lu.assertNotIsInf( 0 / 0 ) -- NaN
         lu.assertNotIsInf( 0 / 1 ) -- 0.0
         assertFailure(lu.assertNotIsInf, 1 / 0 )
@@ -1948,7 +1947,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsString( {})
         lu.assertNotIsString( {1,2,3})
         lu.assertNotIsString( {1})
-        lu.assertNotIsString( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsString( coroutine.create( function(v) return v+1 end ) )
         lu.assertNotIsString( true)
     end
 
@@ -1961,7 +1960,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         assertFailure( lu.assertNotIsTable, {1,2,3})
         assertFailure( lu.assertNotIsTable, {1})
         lu.assertNotIsTable( true)
-        lu.assertNotIsTable( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsTable( coroutine.create( function(v) return v+1 end ) )
     end
 
     function TestLuaUnitAssertions:test_assertNotIsBoolean()
@@ -1972,7 +1971,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsBoolean( {})
         lu.assertNotIsBoolean( {1,2,3})
         lu.assertNotIsBoolean( {1})
-        lu.assertNotIsBoolean( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsBoolean( coroutine.create( function(v) return v+1 end ) )
         assertFailure( lu.assertNotIsBoolean, true)
         assertFailure( lu.assertNotIsBoolean, false)
     end
@@ -1986,7 +1985,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsNil( {1,2,3})
         lu.assertNotIsNil( {1})
         lu.assertNotIsNil( false)
-        lu.assertNotIsNil( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsNil( coroutine.create( function(v) return v+1 end ) )
     end
 
     function TestLuaUnitAssertions:test_assertNotIsFunction()
@@ -2000,7 +1999,7 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsFunction( {1,2,3})
         lu.assertNotIsFunction( {1})
         lu.assertNotIsFunction( false)
-        lu.assertNotIsFunction( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsFunction( coroutine.create( function(v) return v+1 end ) )
         assertFailure( lu.assertNotIsFunction, f)
     end
 
@@ -2013,8 +2012,8 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsThread( {1,2,3})
         lu.assertNotIsThread( {1})
         lu.assertNotIsThread( false)
-        lu.assertNotIsThread( function(v) local y=v+1 end )
-        assertFailure( lu.assertNotIsThread, coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsThread( function(v) return v+1 end )
+        assertFailure( lu.assertNotIsThread, coroutine.create( function(v) return v+1 end ) )
     end
 
     function TestLuaUnitAssertions:test_assertNotIsUserdata()
@@ -2026,8 +2025,8 @@ TestLuaUnitAssertions = { __class__ = 'TestLuaUnitAssertions' }
         lu.assertNotIsUserdata( {1,2,3})
         lu.assertNotIsUserdata( {1})
         lu.assertNotIsUserdata( false)
-        lu.assertNotIsUserdata( function(v) local y=v+1 end )
-        lu.assertNotIsUserdata( coroutine.create( function(v) local y=v+1 end ) )
+        lu.assertNotIsUserdata( function(v) return v+1 end )
+        lu.assertNotIsUserdata( coroutine.create( function(v) return v+1 end ) )
     end
 
     function TestLuaUnitAssertions:test_assertIs()
@@ -2189,17 +2188,15 @@ TestLuaUnitAssertionsError = {}
 
     function TestLuaUnitAssertionsError:setUp()
         self.f = function ( v )
-            local y = v + 1
+            return v + 1
         end
         self.f_with_error = function (v)
-            local y = v + 2
-            error('This is an error', 2)
+            return v + 2, error('This is an error', 2)
         end
 
         self.f_with_table_error = function (v)
-            local y = v + 2
             local ts = { __tostring = function() return 'This table has error!' end }
-            error( setmetatable( { this_table="has error" }, ts ) )
+            return v + 2, error( setmetatable( { this_table="has error" }, ts ) )
         end
 
 
@@ -2708,8 +2705,8 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
     end 
 
     function TestLuaUnitErrorMsg:test_assertNotIsThread()
-        assertFailureContains( 'expected: not a thread type, actual: value thread:', lu.assertNotIsThread, coroutine.create( function(v) local y=v+1 end ) )
-        assertFailureContains( 'toto\nexpected: not a thread type, actual: value thread:', lu.assertNotIsThread, coroutine.create( function(v) local y=v+1 end ), 'toto' )
+        assertFailureContains( 'expected: not a thread type, actual: value thread:', lu.assertNotIsThread, coroutine.create( function(v) return v+1 end ) )
+        assertFailureContains( 'toto\nexpected: not a thread type, actual: value thread:', lu.assertNotIsThread, coroutine.create( function(v) return v+1 end ), 'toto' )
     end 
 
     --[[ How do you create UserData ?
@@ -2746,12 +2743,12 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
     end 
 
     function TestLuaUnitErrorMsg:test_assertError()
-        assertFailureEquals('Expected an error when calling function but no error generated' , lu.assertError, function( v ) local y = v+1 end, 3 )
+        assertFailureEquals('Expected an error when calling function but no error generated' , lu.assertError, function( v ) return v+1 end, 3 )
     end 
 
     function TestLuaUnitErrorMsg:test_assertErrorMsgEquals()
         assertFailureEquals('No error generated when calling function but expected error: "bla bla bla"' , 
-            lu.assertErrorMsgEquals, 'bla bla bla', function( v ) local y = v+1 end, 3 )
+            lu.assertErrorMsgEquals, 'bla bla bla', function( v ) return v+1 end, 3 )
         assertFailureEquals('Error message expected: "bla bla bla"\n' ..
                             'Error message received: "toto xxx"\n' , 
             lu.assertErrorMsgEquals, 'bla bla bla', function() error('toto xxx',2) end, 3 )
@@ -2763,14 +2760,14 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
 
     function TestLuaUnitErrorMsg:test_assertErrorMsgContains()
         assertFailureEquals('No error generated when calling function but expected error containing: "bla bla bla"' , 
-            lu.assertErrorMsgContains, 'bla bla bla', function( v ) local y = v+1 end, 3 )
+            lu.assertErrorMsgContains, 'bla bla bla', function( v ) return v+1 end, 3 )
         assertFailureEquals('Error message does not contain: "bla bla bla"\nError message received: "toto xxx"\n' , 
             lu.assertErrorMsgContains, 'bla bla bla', function() error('toto xxx',2) end, 3 )
     end
 
     function TestLuaUnitErrorMsg:test_assertErrorMsgMatches()
         assertFailureEquals('No error generated when calling function but expected error matching: "bla bla bla"' , 
-            lu.assertErrorMsgMatches, 'bla bla bla', function( v ) local y = v+1 end, 3 )
+            lu.assertErrorMsgMatches, 'bla bla bla', function( v ) return v+1 end, 3 )
 
         assertFailureEquals('Error message does not match pattern: "bla bla bla"\n' ..
                             'Error message received: "toto xxx"\n' , 

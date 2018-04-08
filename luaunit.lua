@@ -893,7 +893,7 @@ local function _table_tostring( tbl, indentLevel, printTableRefs, recursionTable
     recursionTable = recursionTable or {}
     recursionTable[tbl] = true
 
-    local result, dispOnMultLines = {}, false
+    local result = {}
 
     -- like prettystr but do not enclose with "" if the string is just alphanumerical
     -- this is better for displaying table keys who are often simple strings

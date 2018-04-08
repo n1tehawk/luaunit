@@ -46,7 +46,7 @@ end
 
 function TestLuaUnitV2Compat:testAssertType()
     local f = function (v) return v+1 end
-    local t = coroutine.create( function(v) local y=v+1 end )
+    local t = coroutine.create( function(v) return v+1 end )
     local typesToVerify = {
         -- list of: { goodType, badType, goodAsserter, badAsserter }
         {  true, "toto", assertBoolean,  assertNotBoolean },
