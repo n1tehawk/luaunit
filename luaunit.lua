@@ -17,7 +17,7 @@ M.private = {}
 M.VERSION='3.3'
 M._VERSION=M.VERSION -- For LuaUnit v2 compatibility
 
--- a version which distinguish between regular Lua and LuaJit
+-- a version which distinguishes between regular Lua and LuaJIT
 M._LUAVERSION = (jit and jit.version) or _VERSION
 
 --[[ Some people like assertEquals( actual, expected ) and some people prefer
@@ -62,7 +62,7 @@ M.DISABLE_DEEP_ANALYSIS = false
 -- set EXPORT_ASSERT_TO_GLOBALS to have all asserts visible as global values
 -- EXPORT_ASSERT_TO_GLOBALS = true
 
--- we need to keep a copy of the script args before it is overriden
+-- we need to keep a copy of the script args before it is overwritten
 local cmdline_argv = rawget(_G, "arg")
 
 M.FAILURE_PREFIX = 'LuaUnit test FAILURE: ' -- prefix string for failed tests
@@ -520,7 +520,7 @@ function M.adjust_err_msg_with_iter( err_msg, iter_msg )
             if match then
                 err_msg = err_msg:gsub( match, match .. iter_msg )
             else
-                -- no file:line: infromation, just add the iteration info at the beginning of the line
+                -- no file:line: information, just add the iteration info at the beginning of the line
                 err_msg = iter_msg .. err_msg
             end
         end
@@ -536,7 +536,7 @@ local function tryMismatchFormatting( table_a, table_b, doDeepAnalysis )
     Arguments:
     * table_a, table_b: tables to be compared
     * doDeepAnalysis:
-        M.DEFAULT_DEEP_ANALYSIS: (the default if not specified) perform deep analysis only for big lists and big dictionnaries
+        M.DEFAULT_DEEP_ANALYSIS: (the default if not specified) perform deep analysis only for big lists and big dictionaries
         M.FORCE_DEEP_ANALYSIS  : always perform deep analysis
         M.DISABLE_DEEP_ANALYSIS: never perform deep analysis
 
