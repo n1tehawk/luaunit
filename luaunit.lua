@@ -604,7 +604,7 @@ local function extendWithStrFmt( res, ... )
     table.insert( res, string.format( ... ) )
 end
 
-local function mismatchFormattingMapping( table_a, table_b, doDeepAnalysis )
+local function mismatchFormattingMapping( table_a, table_b, doDeepAnalysis ) -- luacheck: ignore 212
     --[[
     Prepares a nice error message when comparing tables which are not pure lists, performing a deeper 
     analysis.
@@ -1948,10 +1948,10 @@ end
 
 -- abstract ("empty") methods
 function genericOutput:startSuite() end
-function genericOutput:startClass(className) end
-function genericOutput:startTest(testName) end
-function genericOutput:addStatus(node) end
-function genericOutput:endTest(node) end
+function genericOutput:startClass() end
+function genericOutput:startTest() end
+function genericOutput:addStatus() end
+function genericOutput:endTest() end
 function genericOutput:endClass() end
 function genericOutput:endSuite() end
 
@@ -2286,7 +2286,7 @@ end
 local NilOutput = { __class__ = 'NilOuptut' } -- class
 local NilOutput_MT = { __index = nopCallable } -- metatable
 
-function NilOutput.new(runner)
+function NilOutput.new()
     return setmetatable( { __class__ = 'NilOutput' }, NilOutput_MT )
 end
 
