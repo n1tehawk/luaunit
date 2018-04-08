@@ -2436,7 +2436,7 @@ end
             error('Unknown option: '..option,3)
         end
 
-        local function setArg( cmdArg, state )
+        local function setArg( cmdArg )
             if state == SET_OUTPUT then
                 result['output'] = cmdArg
                 return
@@ -2469,7 +2469,7 @@ end
 
         for i, cmdArg in ipairs(cmdLine) do
             if state ~= nil then
-                setArg( cmdArg, state, result )
+                setArg( cmdArg )
                 state = nil
             else
                 if cmdArg:sub(1,1) == '-' then

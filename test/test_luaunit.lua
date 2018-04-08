@@ -112,7 +112,7 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
 
         -- run a generic for loop (internally using a separate state)
         local tested = {}
-        for _, v in private.sortedPairs(t1) do table.insert(tested, v) end
+        for _, vv in private.sortedPairs(t1) do table.insert(tested, vv) end
         lu.assertEquals( tested, {'abc', 'cba', 'def'} )
 
         -- test bisection algorithm by searching for non-existing key values
@@ -173,7 +173,7 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
         lu.assertEquals( t[1], '122333')
         lu.assertEquals( #t, 1 )
 
-        local t = private.strsplit( '\n', '1\n22\n333\n' )
+        t = private.strsplit( '\n', '1\n22\n333\n' )
         lu.assertEquals( t[1], '1')
         lu.assertEquals( t[2], '22')
         lu.assertEquals( t[3], '333')
@@ -606,7 +606,7 @@ bar"=1}]] )
         lu.assertEquals(tonumber(line2), tonumber(line1) + 3)
 
         _, err = pcall(babar, 1)
-        local _, prefix = err:match("test[\\/]test_luaunit%.lua:(%d+): (.*)hex=7B$")
+        _, prefix = err:match("test[\\/]test_luaunit%.lua:(%d+): (.*)hex=7B$")
         lu.assertEquals(prefix, lu.FAILURE_PREFIX .. 'toto\n')
 
     end

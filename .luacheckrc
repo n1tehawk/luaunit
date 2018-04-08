@@ -12,9 +12,6 @@ ignore = {
     "211", -- unused variable
     "212", -- unused argument
     "213", -- unused loop variable
-    "411", -- redefinition of variable
-    "421", -- shadowing definition of variable
-    "431", -- shadowing upvalue
     "61[124]", -- ignore whitespace issues
     "631", -- line too long
     "[Tt]est[%w_]+" -- expect test cases to be defined / accessed as globals
