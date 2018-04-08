@@ -31,7 +31,7 @@ echo Setting up Lua 5.1 ...
 if NOT EXIST "lua51\lua5.1.exe" (
     @echo on
     echo Fetching Lua v5.1 from internet
-    curl -fLsS -o %ZIP_51% http://sourceforge.net/projects/luabinaries/files/%VER_51%/Tools%%20Executables/%ZIP_51%/download
+    curl -fLsS --retry 5 -o %ZIP_51% http://sourceforge.net/projects/luabinaries/files/%VER_51%/Tools%%20Executables/%ZIP_51%/download
     unzip -d lua51 %ZIP_51%
 ) else (
     echo Using cached version of Lua v5.1
@@ -47,7 +47,7 @@ echo Setting up Lua 5.2 ...
 if NOT EXIST "lua52\lua52.exe" (
     @echo on
     echo Fetching Lua v5.2 from internet
-    curl -fLsS -o %ZIP_52% http://sourceforge.net/projects/luabinaries/files/%VER_52%/Tools%%20Executables/%ZIP_52%/download
+    curl -fLsS --retry 5 -o %ZIP_52% http://sourceforge.net/projects/luabinaries/files/%VER_52%/Tools%%20Executables/%ZIP_52%/download
     unzip -d lua52 %ZIP_52%
 ) else (
     echo Using cached version of Lua v5.2
@@ -64,7 +64,7 @@ echo Setting up Lua 5.3 ...
 if NOT EXIST "lua53\lua53.exe" (
     @echo on
     echo Fetching Lua v5.3 from internet
-    curl -fLsS -o %ZIP_53% http://sourceforge.net/projects/luabinaries/files/%VER_53%/Tools%%20Executables/%ZIP_53%/download
+    curl -fLsS --retry 5 -o %ZIP_53% http://sourceforge.net/projects/luabinaries/files/%VER_53%/Tools%%20Executables/%ZIP_53%/download
     unzip -d lua53 %ZIP_53%
 ) else (
     echo Using cached version of Lua v5.3
