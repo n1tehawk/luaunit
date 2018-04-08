@@ -559,7 +559,7 @@ local function tryMismatchFormatting( table_a, table_b, doDeepAnalysis )
 
     local len_a, len_b, isPureList = #table_a, #table_b, true
 
-    for k1, v1 in pairs(table_a) do
+    for k1, _ in pairs(table_a) do
         if type(k1) ~= 'number' or k1 > len_a then
             -- this table a mapping
             isPureList = false
@@ -568,7 +568,7 @@ local function tryMismatchFormatting( table_a, table_b, doDeepAnalysis )
     end
 
     if isPureList then
-        for k2, v2 in pairs(table_b) do
+        for k2, _ in pairs(table_b) do
             if type(k2) ~= 'number' or k2 > len_b then
                 -- this table a mapping
                 isPureList = false
@@ -965,7 +965,7 @@ local function _table_tostring_format_result( tbl, result, indentLevel, printTab
 
     -- set dispOnMultLines to true if the maximum LINE_LENGTH would be exceeded with the values
     local totalLength = 0
-    for k, v in ipairs( result ) do
+    for _, v in ipairs( result ) do
         totalLength = totalLength + string.len( v )
         if totalLength >= M.LINE_LENGTH then
             dispOnMultLines = true
@@ -1031,12 +1031,12 @@ local function _is_table_items_equals(actual, expected )
     local type_a, type_e = type(actual), type(expected)
 
     if (type_a == 'table') and (type_e == 'table') then
-        for k, v in pairs(actual) do
+        for _, v in pairs(actual) do
             if not _table_contains(expected, v) then
                 return false
             end
         end
-        for k, v in pairs(expected) do
+        for _, v in pairs(expected) do
             if not _table_contains(actual, v) then
                 return false
             end
@@ -2069,7 +2069,7 @@ JUnitOutput.__class__ = 'JUnitOutput'
         -- XXX please include system name and version if possible
         self.fd:write("        </properties>\n")
 
-        for i,node in ipairs(self.result.tests) do
+        for _, node in ipairs(self.result.tests) do
             self.fd:write(string.format('        <testcase classname="%s" name="%s" time="%0.3f">\n',
                 node.className, node.testName, node.duration ) )
             if node:isNotPassed() then
@@ -2467,7 +2467,7 @@ end
         end
 
 
-        for i, cmdArg in ipairs(cmdLine) do
+        for _, cmdArg in ipairs(cmdLine) do
             if state ~= nil then
                 setArg( cmdArg )
                 state = nil
@@ -2907,7 +2907,7 @@ end
         ]]
         local result = {}
 
-        for i,v in ipairs( listOfNameAndInst ) do
+        for _, v in ipairs( listOfNameAndInst ) do
             local name, instance = v[1], v[2]
             if M.LuaUnit.asFunction(instance) then
                 table.insert( result, { name, instance } )
@@ -2933,7 +2933,7 @@ end
 
     function M.LuaUnit.applyPatternFilter( patternIncFilter, listOfNameAndInst )
         local included, excluded = {}, {}
-        for i, v in ipairs( listOfNameAndInst ) do
+        for _, v in ipairs( listOfNameAndInst ) do
             -- local name, instance = v[1], v[2]
             if  patternFilter( patternIncFilter, v[1] ) then
                 table.insert( included, v )
@@ -2960,7 +2960,7 @@ end
 
         self:startSuite( #filteredList, #filteredOutList )
 
-        for i,v in ipairs( filteredList ) do
+        for _, v in ipairs( filteredList ) do
             local name, instance = v[1], v[2]
             if M.LuaUnit.asFunction(instance) then
                 self:execOneFunction( nil, name, nil, instance )
@@ -2999,7 +2999,7 @@ end
         local instanceName, instance
         local listOfNameAndInst = {}
 
-        for i,name in ipairs( listOfName ) do
+        for _, name in ipairs( listOfName ) do
             local className, methodName = M.LuaUnit.splitClassMethod( name )
             if className then
                 instanceName = className

@@ -11,7 +11,6 @@ globals = { "EXPORT_ASSERT_TO_GLOBALS" }
 ignore = {
     "211", -- unused variable
     "212", -- unused argument
-    "213", -- unused loop variable
     "61[124]", -- ignore whitespace issues
     "631", -- line too long
     "[Tt]est[%w_]+" -- expect test cases to be defined / accessed as globals
