@@ -29,6 +29,9 @@ end
 
 local lu = require('luaunit')
 
+-- import the private functions, for internal testing
+local private = lu._getPrivateExports()
+
 local Mock = { __class__ = 'Mock' }
 
 function Mock.new(runner)
@@ -72,11 +75,11 @@ TestMock = {}
 TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
 
     function TestLuaUnitUtilities:test_genSortedIndex()
-        lu.assertEquals( lu.private.__genSortedIndex( { 2, 5, 7} ), {1,2,3} )
-        lu.assertEquals( lu.private.__genSortedIndex( { a='1', h='2', c='3' } ), {'a', 'c', 'h'} )
-        lu.assertEquals( lu.private.__genSortedIndex( { 1, 'z', a='1', h='2', c='3' } ), { 1, 2, 'a', 'c', 'h' } )
-        lu.assertEquals( lu.private.__genSortedIndex( { b=4, a=3, true, foo="bar", nil, bar=false, 42, c=5 } ),
-                                                      { 1, 3, 'a', 'b', 'bar', 'c', 'foo' } )
+        lu.assertEquals( private.__genSortedIndex( { 2, 5, 7} ), {1,2,3} )
+        lu.assertEquals( private.__genSortedIndex( { a='1', h='2', c='3' } ), {'a', 'c', 'h'} )
+        lu.assertEquals( private.__genSortedIndex( { 1, 'z', a='1', h='2', c='3' } ), { 1, 2, 'a', 'c', 'h' } )
+        lu.assertEquals( private.__genSortedIndex( { b=4, a=3, true, foo="bar", nil, bar=false, 42, c=5 } ),
+                                                   { 1, 3, 'a', 'b', 'bar', 'c', 'foo' } )
     end
 
     function TestLuaUnitUtilities:test_sortedNextWorks()
@@ -87,7 +90,7 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
         t1['bbb'] = 'cba'
 
         -- mimic semantics of "generic for" loop
-        local sortedNext, state = lu.private.sortedPairs(t1)
+        local sortedNext, state = private.sortedPairs(t1)
 
         local k, v = sortedNext( state, nil )
         lu.assertEquals( k, 'aaa' )
@@ -109,7 +112,7 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
 
         -- run a generic for loop (internally using a separate state)
         local tested = {}
-        for _, v in lu.private.sortedPairs(t1) do table.insert(tested, v) end
+        for _, v in private.sortedPairs(t1) do table.insert(tested, v) end
         lu.assertEquals( tested, {'abc', 'cba', 'def'} )
 
         -- test bisection algorithm by searching for non-existing key values
@@ -131,8 +134,8 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
         local t2 = { ['3'] = '33', ['1'] = '11' }
 
         local sortedNext, state1, state2, _
-        _, state1 = lu.private.sortedPairs(t1)
-        sortedNext, state2 = lu.private.sortedPairs(t2)
+        _, state1 = private.sortedPairs(t1)
+        sortedNext, state2 = private.sortedPairs(t2)
 
         local k, v = sortedNext( state1, nil )
         lu.assertEquals( k, 'aaa' )
@@ -158,7 +161,7 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
         end
         lu.assertEquals( #t, n )
 
-        lu.private.randomizeTable( t )
+        private.randomizeTable( t )
         lu.assertEquals( #t, n )
         lu.assertNotEquals( t, tref)
         table.sort(t)
@@ -166,11 +169,11 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
     end
 
     function TestLuaUnitUtilities:test_strSplitOneCharDelim()
-        local t = lu.private.strsplit( '\n', '122333' )
+        local t = private.strsplit( '\n', '122333' )
         lu.assertEquals( t[1], '122333')
         lu.assertEquals( #t, 1 )
 
-        local t = lu.private.strsplit( '\n', '1\n22\n333\n' )
+        local t = private.strsplit( '\n', '1\n22\n333\n' )
         lu.assertEquals( t[1], '1')
         lu.assertEquals( t[2], '22')
         lu.assertEquals( t[3], '333')
@@ -178,11 +181,11 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
         lu.assertEquals( #t, 4 )
         -- test invalid (empty) delimiter
         lu.assertErrorMsgContains('delimiter matches empty string!',
-                                  lu.private.strsplit, '', '1\n22\n333\n')
+                                  private.strsplit, '', '1\n22\n333\n')
     end
 
     function TestLuaUnitUtilities:test_strSplit3CharDelim()
-        local t = lu.private.strsplit( '2\n3', '1\n22\n332\n3' )
+        local t = private.strsplit( '2\n3', '1\n22\n332\n3' )
         lu.assertEquals( t[1], '1\n2')
         lu.assertEquals( t[2], '3')
         lu.assertEquals( t[3], '')
@@ -200,7 +203,7 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
     end
 
     function TestLuaUnitUtilities:test_prefixString()
-        lu.assertEquals( lu.private.prefixString( '12 ', 'ab\ncd\nde'), '12 ab\n12 cd\n12 de' )
+        lu.assertEquals( private.prefixString( '12 ', 'ab\ncd\nde'), '12 ab\n12 cd\n12 de' )
     end
 
     function TestLuaUnitUtilities:test_is_table_equals()
@@ -230,14 +233,14 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
     end
 
     function TestLuaUnitUtilities:test_suitableForMismatchFormatting()
-        lu.assertFalse( lu.private.tryMismatchFormatting( {1,2}, {2,1} ) )
-        lu.assertFalse( lu.private.tryMismatchFormatting( nil, { 1,2,3} ) )
-        lu.assertFalse( lu.private.tryMismatchFormatting( {1,2,3}, {} ) )
-        lu.assertFalse( lu.private.tryMismatchFormatting( "123", "123" ) )
-        lu.assertFalse( lu.private.tryMismatchFormatting( "123", "123" ) )
-        lu.assertFalse( lu.private.tryMismatchFormatting( {'a','b','c'}, {'c', 'b', 'a'} ))
-        lu.assertFalse( lu.private.tryMismatchFormatting( {1,2,3, toto='titi'}, {1,2,3, toto='tata', tutu="bloup" } ) )
-        lu.assertFalse( lu.private.tryMismatchFormatting( {1,2,3, [5]=1000}, {1,2,3} ) )
+        lu.assertFalse( private.tryMismatchFormatting( {1,2}, {2,1} ) )
+        lu.assertFalse( private.tryMismatchFormatting( nil, { 1,2,3} ) )
+        lu.assertFalse( private.tryMismatchFormatting( {1,2,3}, {} ) )
+        lu.assertFalse( private.tryMismatchFormatting( "123", "123" ) )
+        lu.assertFalse( private.tryMismatchFormatting( "123", "123" ) )
+        lu.assertFalse( private.tryMismatchFormatting( {'a','b','c'}, {'c', 'b', 'a'} ))
+        lu.assertFalse( private.tryMismatchFormatting( {1,2,3, toto='titi'}, {1,2,3, toto='tata', tutu="bloup" } ) )
+        lu.assertFalse( private.tryMismatchFormatting( {1,2,3, [5]=1000}, {1,2,3} ) )
 
         local i=0
         local l1, l2={}, {}
@@ -247,32 +250,32 @@ TestLuaUnitUtilities = { __class__ = 'TestLuaUnitUtilities' }
             table.insert( l2, i+1 )
         end
 
-        lu.assertTrue( lu.private.tryMismatchFormatting( l1, l2 ) )
+        lu.assertTrue( private.tryMismatchFormatting( l1, l2 ) )
     end
 
 
     function TestLuaUnitUtilities:test_diffAnalysisThreshold()
         local threshold =  lu.LIST_DIFF_ANALYSIS_THRESHOLD
-        lu.assertFalse( lu.private.tryMismatchFormatting( range(1,threshold-1), range(1,threshold-2), lu.DEFAULT_DEEP_ANALYSIS ) )
-        lu.assertTrue(  lu.private.tryMismatchFormatting( range(1,threshold),   range(1,threshold),   lu.DEFAULT_DEEP_ANALYSIS ) )
+        lu.assertFalse( private.tryMismatchFormatting( range(1,threshold-1), range(1,threshold-2), lu.DEFAULT_DEEP_ANALYSIS ) )
+        lu.assertTrue(  private.tryMismatchFormatting( range(1,threshold),   range(1,threshold),   lu.DEFAULT_DEEP_ANALYSIS ) )
 
-        lu.assertFalse( lu.private.tryMismatchFormatting( range(1,threshold-1), range(1,threshold-2), lu.DISABLE_DEEP_ANALYSIS ) )
-        lu.assertFalse( lu.private.tryMismatchFormatting( range(1,threshold),   range(1,threshold),   lu.DISABLE_DEEP_ANALYSIS ) )
+        lu.assertFalse( private.tryMismatchFormatting( range(1,threshold-1), range(1,threshold-2), lu.DISABLE_DEEP_ANALYSIS ) )
+        lu.assertFalse( private.tryMismatchFormatting( range(1,threshold),   range(1,threshold),   lu.DISABLE_DEEP_ANALYSIS ) )
 
-        lu.assertTrue( lu.private.tryMismatchFormatting( range(1,threshold-1), range(1,threshold-2), lu.FORCE_DEEP_ANALYSIS ) ) 
-        lu.assertTrue( lu.private.tryMismatchFormatting( range(1,threshold),   range(1,threshold),   lu.FORCE_DEEP_ANALYSIS ) )
+        lu.assertTrue( private.tryMismatchFormatting( range(1,threshold-1), range(1,threshold-2), lu.FORCE_DEEP_ANALYSIS ) )
+        lu.assertTrue( private.tryMismatchFormatting( range(1,threshold),   range(1,threshold),   lu.FORCE_DEEP_ANALYSIS ) )
     end
 
     function TestLuaUnitUtilities:test_table_raw_tostring()
         local t1 = {'1','2'}
         lu.assertStrMatches( tostring(t1), 'table: 0?x?[%x]+' )
-        lu.assertStrMatches( lu.private._table_raw_tostring(t1), 'table: 0?x?[%x]+' )
+        lu.assertStrMatches( private._table_raw_tostring(t1), 'table: 0?x?[%x]+' )
 
         local ts = function(t) return t[1]..t[2] end
         local mt = { __tostring = ts }
         setmetatable( t1, mt )
         lu.assertStrMatches( tostring(t1), '12' )
-        lu.assertStrMatches( lu.private._table_raw_tostring(t1), 'table: 0?x?[%x]+' )
+        lu.assertStrMatches( private._table_raw_tostring(t1), 'table: 0?x?[%x]+' )
     end
 
     function TestLuaUnitUtilities:test_prettystr_numbers()
@@ -377,7 +380,7 @@ bar"=1}]] )
             '}',
         } , '\n' ) )
 
-        lu.assertTrue( lu.private.hasNewLine( lu.prettystr(t2)) )
+        lu.assertTrue( private.hasNewLine( lu.prettystr(t2)) )
 
         local t2bis = { 1,2,3,'12345678901234567890123456789012345678901234567890123456789012345678901234567890', 4,5,6 }
         lu.assertEquals(lu.prettystr(t2bis), [[{
@@ -503,76 +506,76 @@ bar"=1}]] )
         -- test all combinations of: foo = nil, "foo", "fo\no" (embedded
         -- newline); and bar = nil, "bar", "bar\n" (trailing newline)
 
-        str1, str2 = lu.private.prettystrPairs(foo, bar)
+        str1, str2 = private.prettystrPairs(foo, bar)
         lu.assertEquals(str1, "nil")
         lu.assertEquals(str2, "nil")
-        str1, str2 = lu.private.prettystrPairs(foo, bar, "_A", "_B")
+        str1, str2 = private.prettystrPairs(foo, bar, "_A", "_B")
         lu.assertEquals(str1, "nil_B")
         lu.assertEquals(str2, "nil")
 
         bar = "bar"
-        str1, str2 = lu.private.prettystrPairs(foo, bar)
+        str1, str2 = private.prettystrPairs(foo, bar)
         lu.assertEquals(str1, "nil")
         lu.assertEquals(str2, '"bar"')
-        str1, str2 = lu.private.prettystrPairs(foo, bar, "_A", "_B")
+        str1, str2 = private.prettystrPairs(foo, bar, "_A", "_B")
         lu.assertEquals(str1, "nil_B")
         lu.assertEquals(str2, '"bar"')
 
         bar = "bar\n"
-        str1, str2 = lu.private.prettystrPairs(foo, bar)
+        str1, str2 = private.prettystrPairs(foo, bar)
         lu.assertEquals(str1, "\nnil")
         lu.assertEquals(str2, '\n"bar\n"')
-        str1, str2 = lu.private.prettystrPairs(foo, bar, "_A", "_B")
+        str1, str2 = private.prettystrPairs(foo, bar, "_A", "_B")
         lu.assertEquals(str1, "\nnil_A")
         lu.assertEquals(str2, '\n"bar\n"')
 
         foo = "foo"
         bar = nil
-        str1, str2 = lu.private.prettystrPairs(foo, bar)
+        str1, str2 = private.prettystrPairs(foo, bar)
         lu.assertEquals(str1, '"foo"')
         lu.assertEquals(str2, "nil")
-        str1, str2 = lu.private.prettystrPairs(foo, bar, "_A", "_B")
+        str1, str2 = private.prettystrPairs(foo, bar, "_A", "_B")
         lu.assertEquals(str1, '"foo"_B')
         lu.assertEquals(str2, "nil")
 
         bar = "bar"
-        str1, str2 = lu.private.prettystrPairs(foo, bar)
+        str1, str2 = private.prettystrPairs(foo, bar)
         lu.assertEquals(str1, '"foo"')
         lu.assertEquals(str2, '"bar"')
-        str1, str2 = lu.private.prettystrPairs(foo, bar, "_A", "_B")
+        str1, str2 = private.prettystrPairs(foo, bar, "_A", "_B")
         lu.assertEquals(str1, '"foo"_B')
         lu.assertEquals(str2, '"bar"')
 
         bar = "bar\n"
-        str1, str2 = lu.private.prettystrPairs(foo, bar)
+        str1, str2 = private.prettystrPairs(foo, bar)
         lu.assertEquals(str1, '\n"foo"')
         lu.assertEquals(str2, '\n"bar\n"')
-        str1, str2 = lu.private.prettystrPairs(foo, bar, "_A", "_B")
+        str1, str2 = private.prettystrPairs(foo, bar, "_A", "_B")
         lu.assertEquals(str1, '\n"foo"_A')
         lu.assertEquals(str2, '\n"bar\n"')
 
         foo = "fo\no"
         bar = nil
-        str1, str2 = lu.private.prettystrPairs(foo, bar)
+        str1, str2 = private.prettystrPairs(foo, bar)
         lu.assertEquals(str1, '\n"fo\no"')
         lu.assertEquals(str2, "\nnil")
-        str1, str2 = lu.private.prettystrPairs(foo, bar, "_A", "_B")
+        str1, str2 = private.prettystrPairs(foo, bar, "_A", "_B")
         lu.assertEquals(str1, '\n"fo\no"_A')
         lu.assertEquals(str2, "\nnil")
 
         bar = "bar"
-        str1, str2 = lu.private.prettystrPairs(foo, bar)
+        str1, str2 = private.prettystrPairs(foo, bar)
         lu.assertEquals(str1, '\n"fo\no"')
         lu.assertEquals(str2, '\n"bar"')
-        str1, str2 = lu.private.prettystrPairs(foo, bar, "_A", "_B")
+        str1, str2 = private.prettystrPairs(foo, bar, "_A", "_B")
         lu.assertEquals(str1, '\n"fo\no"_A')
         lu.assertEquals(str2, '\n"bar"')
 
         bar = "bar\n"
-        str1, str2 = lu.private.prettystrPairs(foo, bar)
+        str1, str2 = private.prettystrPairs(foo, bar)
         lu.assertEquals(str1, '\n"fo\no"')
         lu.assertEquals(str2, '\n"bar\n"')
-        str1, str2 = lu.private.prettystrPairs(foo, bar, "_A", "_B")
+        str1, str2 = private.prettystrPairs(foo, bar, "_A", "_B")
         lu.assertEquals(str1, '\n"fo\no"_A')
         lu.assertEquals(str2, '\n"bar\n"')
     end
@@ -580,10 +583,10 @@ bar"=1}]] )
     function TestLuaUnitUtilities:test_FailFmt()
         -- raise failure from within nested functions
         local function babar(level)
-            lu.private.fail_fmt(level, 'toto', "hex=%X", 123)
+            private.fail_fmt(level, 'toto', "hex=%X", 123)
         end
         local function bar(level)
-            lu.private.fail_fmt(level, nil, "hex=%X", 123)
+            private.fail_fmt(level, nil, "hex=%X", 123)
         end
         local function foo(level)
             bar(level)
@@ -682,45 +685,45 @@ bar"=1}]] )
     end
 
     function TestLuaUnitUtilities:test_patternFilter()
-        lu.assertEquals( lu.private.patternFilter( nil, 'toto'), true )
-        lu.assertEquals( lu.private.patternFilter( {}, 'toto'), true  )
+        lu.assertEquals( private.patternFilter( nil, 'toto'), true )
+        lu.assertEquals( private.patternFilter( {}, 'toto'), true  )
 
         -- positive pattern
-        lu.assertEquals( lu.private.patternFilter( {'toto'}, 'toto'), true )
-        lu.assertEquals( lu.private.patternFilter( {'toto'}, 'yyytotoxxx'), true )
-        lu.assertEquals( lu.private.patternFilter( {'titi', 'toto'}, 'yyytotoxxx'), true )
-        lu.assertEquals( lu.private.patternFilter( {'titi', 'toto'}, 'tutu'), false )
-        lu.assertEquals( lu.private.patternFilter( {'titi', 'to..'}, 'yyytoxxx'), true )
+        lu.assertEquals( private.patternFilter( {'toto'}, 'toto'), true )
+        lu.assertEquals( private.patternFilter( {'toto'}, 'yyytotoxxx'), true )
+        lu.assertEquals( private.patternFilter( {'titi', 'toto'}, 'yyytotoxxx'), true )
+        lu.assertEquals( private.patternFilter( {'titi', 'toto'}, 'tutu'), false )
+        lu.assertEquals( private.patternFilter( {'titi', 'to..'}, 'yyytoxxx'), true )
 
         -- negative pattern
-        lu.assertEquals( lu.private.patternFilter( {'!toto'}, 'toto'), false )
-        lu.assertEquals( lu.private.patternFilter( {'!t.t.'}, 'titi'), false )
-        lu.assertEquals( lu.private.patternFilter( {'!toto'}, 'titi'), true )
-        lu.assertEquals( lu.private.patternFilter( {'!toto'}, 'yyytotoxxx'), false )
-        lu.assertEquals( lu.private.patternFilter( {'!titi', '!toto'}, 'yyytotoxxx'), false )
-        lu.assertEquals( lu.private.patternFilter( {'!titi', '!toto'}, 'tutu'), true )
-        lu.assertEquals( lu.private.patternFilter( {'!titi', '!to..'}, 'yyytoxxx'), false )
+        lu.assertEquals( private.patternFilter( {'!toto'}, 'toto'), false )
+        lu.assertEquals( private.patternFilter( {'!t.t.'}, 'titi'), false )
+        lu.assertEquals( private.patternFilter( {'!toto'}, 'titi'), true )
+        lu.assertEquals( private.patternFilter( {'!toto'}, 'yyytotoxxx'), false )
+        lu.assertEquals( private.patternFilter( {'!titi', '!toto'}, 'yyytotoxxx'), false )
+        lu.assertEquals( private.patternFilter( {'!titi', '!toto'}, 'tutu'), true )
+        lu.assertEquals( private.patternFilter( {'!titi', '!to..'}, 'yyytoxxx'), false )
 
         -- combine patterns
-        lu.assertEquals( lu.private.patternFilter( { 'foo' }, 'foo'), true )
-        lu.assertEquals( lu.private.patternFilter( { 'foo', '!foo' }, 'foo'), false )
-        lu.assertEquals( lu.private.patternFilter( { 'foo', '!foo', 'foo' }, 'foo'), true )
-        lu.assertEquals( lu.private.patternFilter( { 'foo', '!foo', 'foo', '!foo' }, 'foo'), false )
+        lu.assertEquals( private.patternFilter( { 'foo' }, 'foo'), true )
+        lu.assertEquals( private.patternFilter( { 'foo', '!foo' }, 'foo'), false )
+        lu.assertEquals( private.patternFilter( { 'foo', '!foo', 'foo' }, 'foo'), true )
+        lu.assertEquals( private.patternFilter( { 'foo', '!foo', 'foo', '!foo' }, 'foo'), false )
 
-        lu.assertEquals( lu.private.patternFilter( { '!foo' }, 'foo'), false )
-        lu.assertEquals( lu.private.patternFilter( { '!foo', 'foo' }, 'foo'), true )
-        lu.assertEquals( lu.private.patternFilter( { '!foo', 'foo', '!foo' }, 'foo'), false )
-        lu.assertEquals( lu.private.patternFilter( { '!foo', 'foo', '!foo', 'foo' }, 'foo'), true )
+        lu.assertEquals( private.patternFilter( { '!foo' }, 'foo'), false )
+        lu.assertEquals( private.patternFilter( { '!foo', 'foo' }, 'foo'), true )
+        lu.assertEquals( private.patternFilter( { '!foo', 'foo', '!foo' }, 'foo'), false )
+        lu.assertEquals( private.patternFilter( { '!foo', 'foo', '!foo', 'foo' }, 'foo'), true )
 
-        lu.assertEquals( lu.private.patternFilter( { 'f..', '!foo', '__foo__' }, 'toto'), false )
-        lu.assertEquals( lu.private.patternFilter( { 'f..', '!foo', '__foo__' }, 'fii'), true )
-        lu.assertEquals( lu.private.patternFilter( { 'f..', '!foo', '__foo__' }, 'foo'), false )
-        lu.assertEquals( lu.private.patternFilter( { 'f..', '!foo', '__foo__' }, '__foo__'), true )
+        lu.assertEquals( private.patternFilter( { 'f..', '!foo', '__foo__' }, 'toto'), false )
+        lu.assertEquals( private.patternFilter( { 'f..', '!foo', '__foo__' }, 'fii'), true )
+        lu.assertEquals( private.patternFilter( { 'f..', '!foo', '__foo__' }, 'foo'), false )
+        lu.assertEquals( private.patternFilter( { 'f..', '!foo', '__foo__' }, '__foo__'), true )
 
-        lu.assertEquals( lu.private.patternFilter( { '!f..', 'foo', '!__foo__' }, 'toto'), false )
-        lu.assertEquals( lu.private.patternFilter( { '!f..', 'foo', '!__foo__' }, 'fii'), false )
-        lu.assertEquals( lu.private.patternFilter( { '!f..', 'foo', '!__foo__' }, 'foo'), true )
-        lu.assertEquals( lu.private.patternFilter( { '!f..', 'foo', '!__foo__' }, '__foo__'), false )
+        lu.assertEquals( private.patternFilter( { '!f..', 'foo', '!__foo__' }, 'toto'), false )
+        lu.assertEquals( private.patternFilter( { '!f..', 'foo', '!__foo__' }, 'fii'), false )
+        lu.assertEquals( private.patternFilter( { '!f..', 'foo', '!__foo__' }, 'foo'), true )
+        lu.assertEquals( private.patternFilter( { '!f..', 'foo', '!__foo__' }, '__foo__'), false )
     end
 
     function TestLuaUnitUtilities:test_applyPatternFilter()
@@ -774,16 +777,16 @@ bar"=1}]] )
     end
 
     function TestLuaUnitUtilities:test_strMatch()
-        lu.assertEquals( lu.private.strMatch('toto', 't.t.'), true )
-        lu.assertEquals( lu.private.strMatch('toto', 't.t.', 1, 4), true )
-        lu.assertEquals( lu.private.strMatch('toto', 't.t.', 2, 5), false )
-        lu.assertEquals( lu.private.strMatch('toto', '.t.t.'), false )
-        lu.assertEquals( lu.private.strMatch('ototo', 't.t.'), false )
-        lu.assertEquals( lu.private.strMatch('totot', 't.t.'), false )
-        lu.assertEquals( lu.private.strMatch('ototot', 't.t.'), false )
-        lu.assertEquals( lu.private.strMatch('ototot', 't.t.',2,3), false )
-        lu.assertEquals( lu.private.strMatch('ototot', 't.t.',2,5), true  )
-        lu.assertEquals( lu.private.strMatch('ototot', 't.t.',2,6), false )
+        lu.assertEquals( private.strMatch('toto', 't.t.'), true )
+        lu.assertEquals( private.strMatch('toto', 't.t.', 1, 4), true )
+        lu.assertEquals( private.strMatch('toto', 't.t.', 2, 5), false )
+        lu.assertEquals( private.strMatch('toto', '.t.t.'), false )
+        lu.assertEquals( private.strMatch('ototo', 't.t.'), false )
+        lu.assertEquals( private.strMatch('totot', 't.t.'), false )
+        lu.assertEquals( private.strMatch('ototot', 't.t.'), false )
+        lu.assertEquals( private.strMatch('ototot', 't.t.',2,3), false )
+        lu.assertEquals( private.strMatch('ototot', 't.t.',2,5), true  )
+        lu.assertEquals( private.strMatch('ototot', 't.t.',2,6), false )
     end
 
     function TestLuaUnitUtilities:test_expandOneClass()
@@ -824,24 +827,24 @@ bar"=1}]] )
     end
 
     function TestLuaUnitUtilities:test_xmlEscape()
-        lu.assertEquals( lu.private.xmlEscape( 'abc' ), 'abc' )
-        lu.assertEquals( lu.private.xmlEscape( 'a"bc' ), 'a&quot;bc' )
-        lu.assertEquals( lu.private.xmlEscape( "a'bc" ), 'a&apos;bc' )
-        lu.assertEquals( lu.private.xmlEscape( "a<b&c>" ), 'a&lt;b&amp;c&gt;' )
+        lu.assertEquals( private.xmlEscape( 'abc' ), 'abc' )
+        lu.assertEquals( private.xmlEscape( 'a"bc' ), 'a&quot;bc' )
+        lu.assertEquals( private.xmlEscape( "a'bc" ), 'a&apos;bc' )
+        lu.assertEquals( private.xmlEscape( "a<b&c>" ), 'a&lt;b&amp;c&gt;' )
     end
 
     function TestLuaUnitUtilities:test_xmlCDataEscape()
-        lu.assertEquals( lu.private.xmlCDataEscape( 'abc' ), 'abc' )
-        lu.assertEquals( lu.private.xmlCDataEscape( 'a"bc' ), 'a"bc' )
-        lu.assertEquals( lu.private.xmlCDataEscape( "a'bc" ), "a'bc" )
-        lu.assertEquals( lu.private.xmlCDataEscape( "a<b&c>" ), 'a<b&c>' )
-        lu.assertEquals( lu.private.xmlCDataEscape( "a<b]]>--" ), 'a<b]]&gt;--' )
+        lu.assertEquals( private.xmlCDataEscape( 'abc' ), 'abc' )
+        lu.assertEquals( private.xmlCDataEscape( 'a"bc' ), 'a"bc' )
+        lu.assertEquals( private.xmlCDataEscape( "a'bc" ), "a'bc" )
+        lu.assertEquals( private.xmlCDataEscape( "a<b&c>" ), 'a<b&c>' )
+        lu.assertEquals( private.xmlCDataEscape( "a<b]]>--" ), 'a<b]]&gt;--' )
     end
 
     function TestLuaUnitUtilities:test_hasNewline()
-        lu.assertEquals( lu.private.hasNewLine(''), false )
-        lu.assertEquals( lu.private.hasNewLine('abc'), false )
-        lu.assertEquals( lu.private.hasNewLine('ab\nc'), true )
+        lu.assertEquals( private.hasNewLine(''), false )
+        lu.assertEquals( private.hasNewLine('abc'), false )
+        lu.assertEquals( private.hasNewLine('ab\nc'), true )
     end
 
     function TestLuaUnitUtilities:test_stripStackTrace()
@@ -884,19 +887,19 @@ bar"=1}]] )
         [C]: in ?]]
 
 
-        local strippedStackTrace=lu.private.stripLuaunitTrace( realStackTrace )
+        local strippedStackTrace=private.stripLuaunitTrace( realStackTrace )
         -- print( strippedStackTrace )
 
         local expectedStackTrace=[[stack traceback:
         example_with_luaunit.lua:130: in function 'test2_withFailure']]
         lu.assertEquals( strippedStackTrace, expectedStackTrace )
 
-        strippedStackTrace=lu.private.stripLuaunitTrace( realStackTrace2 )
+        strippedStackTrace=private.stripLuaunitTrace( realStackTrace2 )
         expectedStackTrace=[[stack traceback:
         example_with_luaunit.lua:58: in function 'TestToto.test7']]
         lu.assertEquals( strippedStackTrace, expectedStackTrace )
 
-        strippedStackTrace=lu.private.stripLuaunitTrace( realStackTrace3 )
+        strippedStackTrace=private.stripLuaunitTrace( realStackTrace3 )
         expectedStackTrace=[[stack traceback:
         luaunit2/example_with_luaunit.lua:124: in function 'test1_withFailure']]
         lu.assertEquals( strippedStackTrace, expectedStackTrace )

@@ -11,9 +11,6 @@ License: BSD License, see LICENSE.txt
 require("math")
 local M={}
 
--- private exported functions (for testing)
-M.private = {}
-
 M.VERSION='3.3'
 M._VERSION=M.VERSION -- For LuaUnit v2 compatibility
 
@@ -93,7 +90,14 @@ Options:
                               TestClass or TestClass.testMethod
 ]]
 
-local is_equal -- defined here to allow calling from mismatchFormattingPureList
+-- private exported functions
+-- (for INTERNAL testing and use of "forward" function declarations)
+local private = {}
+
+-- INTERNAL USE ONLY - you shouldn't use this function in your code, ever.
+function M._getPrivateExports()
+    return private
+end
 
 ----------------------------------------------------------------
 --
@@ -146,7 +150,7 @@ local function __genSortedIndex( t )
     table.sort(sortedIndex, crossTypeSort)
     return sortedIndex
 end
-M.private.__genSortedIndex = __genSortedIndex
+private.__genSortedIndex = __genSortedIndex
 
 local function sortedNext(state, control)
     -- Equivalent of the next() function of table iteration, but returns the
@@ -206,7 +210,7 @@ local function sortedPairs(tbl)
     -- (see http://www.lua.org/pil/7.2.html)
     return sortedNext, {t = tbl, sortedIdx = __genSortedIndex(tbl)}, nil
 end
-M.private.sortedPairs = sortedPairs
+private.sortedPairs = sortedPairs
 
 -- seed the random with a strongly varying seed
 math.randomseed(os.clock()*1E11)
@@ -220,7 +224,7 @@ local function randomizeTable( t )
         end
     end
 end
-M.private.randomizeTable = randomizeTable
+private.randomizeTable = randomizeTable
 
 local function strsplit(delimiter, text)
 -- Split text into a list consisting of the strings in text, separated
@@ -242,19 +246,19 @@ local function strsplit(delimiter, text)
     end
     return list
 end
-M.private.strsplit = strsplit
+private.strsplit = strsplit
 
 local function hasNewLine( s )
     -- return true if s has a newline
     return (string.find(s, '\n', 1, true) ~= nil)
 end
-M.private.hasNewLine = hasNewLine
+private.hasNewLine = hasNewLine
 
 local function prefixString( prefix, s )
     -- Prefix all the lines of s with prefix
     return prefix .. string.gsub(s, '\n', '\n' .. prefix)
 end
-M.private.prefixString = prefixString
+private.prefixString = prefixString
 
 local function strMatch(s, pattern, start, final )
     -- return true if s matches completely the pattern from index start to index end
@@ -267,7 +271,7 @@ local function strMatch(s, pattern, start, final )
     local foundStart, foundEnd = string.find(s, pattern, start, false)
     return foundStart == start and foundEnd == final
 end
-M.private.strMatch = strMatch
+private.strMatch = strMatch
 
 local function patternFilter(patterns, expr)
     -- Run `expr` through the inclusion and exclusion rules defined in patterns
@@ -304,7 +308,7 @@ local function patternFilter(patterns, expr)
     end
     return default
 end
-M.private.patternFilter = patternFilter
+private.patternFilter = patternFilter
 
 local function xmlEscape( s )
     -- Return s escaped for XML attributes
@@ -323,13 +327,13 @@ local function xmlEscape( s )
         ['>'] = "&gt;",
     } )
 end
-M.private.xmlEscape = xmlEscape
+private.xmlEscape = xmlEscape
 
 local function xmlCDataEscape( s )
     -- Return s escaped for CData section, escapes: "]]>"
     return string.gsub( s, ']]>', ']]&gt;' )
 end
-M.private.xmlCDataEscape = xmlCDataEscape
+private.xmlCDataEscape = xmlCDataEscape
 
 local function stripLuaunitTrace( stackTrace )
     --[[
@@ -418,7 +422,7 @@ local function stripLuaunitTrace( stackTrace )
     return table.concat( t, '\n')
 
 end
-M.private.stripLuaunitTrace = stripLuaunitTrace
+private.stripLuaunitTrace = stripLuaunitTrace
 
 
 local function prettystr_sub(v, indentLevel, printTableRefs, recursionTable )
@@ -436,7 +440,7 @@ local function prettystr_sub(v, indentLevel, printTableRefs, recursionTable )
         --if v.__class__ then
         --    return string.gsub( tostring(v), 'table', v.__class__ )
         --end
-        return M.private._table_tostring(v, indentLevel, printTableRefs, recursionTable)
+        return private._table_tostring(v, indentLevel, printTableRefs, recursionTable)
 
     elseif "number" == type_v then
         -- eliminate differences in formatting between various Lua versions
@@ -582,14 +586,14 @@ local function tryMismatchFormatting( table_a, table_b, doDeepAnalysis )
     end
 
     if isPureList then
-        return M.private.mismatchFormattingPureList( table_a, table_b )
+        return private.mismatchFormattingPureList( table_a, table_b )
     else
         -- only work on mapping for the moment
-        -- return M.private.mismatchFormattingMapping( table_a, table_b, doDeepAnalysis )
+        -- return private.mismatchFormattingMapping( table_a, table_b, doDeepAnalysis )
         return false
     end
 end
-M.private.tryMismatchFormatting = tryMismatchFormatting
+private.tryMismatchFormatting = tryMismatchFormatting
 
 local function getTaTbDescr()
     if not M.ORDER_ACTUAL_EXPECTED then
@@ -718,7 +722,7 @@ local function mismatchFormattingMapping( table_a, table_b, doDeepAnalysis )
     return true, table.concat( result, '\n')
     ]]
 end
-M.private.mismatchFormattingMapping = mismatchFormattingMapping
+private.mismatchFormattingMapping = mismatchFormattingMapping
 
 local function list_compare( table_a, table_b )
     --[[
@@ -740,7 +744,7 @@ local function list_compare( table_a, table_b )
 
     local commonUntil = shortest
     for i = 1, shortest do
-        if not is_equal(table_a[i], table_b[i]) then
+        if not private.is_equal(table_a[i], table_b[i]) then
             commonUntil = i - 1
             break
         end
@@ -748,7 +752,7 @@ local function list_compare( table_a, table_b )
 
     local commonBackTo = shortest - 1
     for i = 0, shortest - 1 do
-        if not is_equal(table_a[len_a-i], table_b[len_b-i]) then
+        if not private.is_equal(table_a[len_a-i], table_b[len_b-i]) then
             commonBackTo = i - 1
             break
         end
@@ -795,7 +799,7 @@ local function mismatchFormattingPureList( table_a, table_b )
 
     local function insertABValue(ai, bi)
         bi = bi or ai
-        if is_equal( table_a[ai], table_b[bi]) then
+        if private.is_equal( table_a[ai], table_b[bi]) then
             return extendWithStrFmt( result, '  = A[%d], B[%d]: %s', ai, bi, prettystr(table_a[ai]) )
         else
             extendWithStrFmt( result, '  - A[%d]: %s', ai, prettystr(table_a[ai]))
@@ -847,7 +851,7 @@ local function mismatchFormattingPureList( table_a, table_b )
 
     return true, table.concat( result, '\n')
 end
-M.private.mismatchFormattingPureList = mismatchFormattingPureList
+private.mismatchFormattingPureList = mismatchFormattingPureList
 
 local function prettystrPairs(value1, value2, suffix_a, suffix_b)
     --[[
@@ -870,7 +874,7 @@ local function prettystrPairs(value1, value2, suffix_a, suffix_b)
     end
     return str1 .. (suffix_b or ""), str2
 end
-M.private.prettystrPairs = prettystrPairs
+private.prettystrPairs = prettystrPairs
 
 local function _table_raw_tostring( t )
     -- return the default tostring() for tables, with the table ID, even if the table has a metatable
@@ -881,7 +885,7 @@ local function _table_raw_tostring( t )
     if mt then setmetatable( t, mt ) end
     return ref
 end
-M.private._table_raw_tostring = _table_raw_tostring
+private._table_raw_tostring = _table_raw_tostring
 
 local TABLE_TOSTRING_SEP = ", "
 local TABLE_TOSTRING_SEP_LEN = string.len(TABLE_TOSTRING_SEP)
@@ -908,7 +912,7 @@ local function _table_tostring( tbl, indentLevel, printTableRefs, recursionTable
         -- if table has a __tostring() function in its metatable, use it to display the table
         -- else, compute a regular table
         result = strsplit( '\n', tostring(tbl) )
-        return M.private._table_tostring_format_multiline_string( result, indentLevel )
+        return private._table_tostring_format_multiline_string( result, indentLevel )
 
     else
         -- no metatable, compute the table representation
@@ -941,18 +945,18 @@ local function _table_tostring( tbl, indentLevel, printTableRefs, recursionTable
             count = count + 1
             result[count] = entry
         end
-        return M.private._table_tostring_format_result( tbl, result, indentLevel, printTableRefs )
+        return private._table_tostring_format_result( tbl, result, indentLevel, printTableRefs )
     end
 
 end
-M.private._table_tostring = _table_tostring -- prettystr_sub() needs it
+private._table_tostring = _table_tostring -- prettystr_sub() needs it
 
 local function _table_tostring_format_multiline_string( tbl_str, indentLevel )
     local indentString = '\n'..string.rep("    ", indentLevel - 1)
     return table.concat( tbl_str, indentString )
 
 end
-M.private._table_tostring_format_multiline_string = _table_tostring_format_multiline_string
+private._table_tostring_format_multiline_string = _table_tostring_format_multiline_string
 
 
 local function _table_tostring_format_result( tbl, result, indentLevel, printTableRefs )
@@ -1001,7 +1005,7 @@ local function _table_tostring_format_result( tbl, result, indentLevel, printTab
     end
     return table.concat(result)
 end
-M.private._table_tostring_format_result = _table_tostring_format_result -- prettystr_sub() needs it
+private._table_tostring_format_result = _table_tostring_format_result -- prettystr_sub() needs it
 
 local function _table_contains(t, element)
     if type(t) == "table" then
@@ -1015,7 +1019,7 @@ local function _table_contains(t, element)
                     -- if we wanted recursive items content comparison, we could use
                     -- _is_table_items_equals(v, expected) but one level of just comparing
                     -- items is sufficient
-                    if M.private._is_table_equals( value, element ) then
+                    if private._is_table_equals( value, element ) then
                         return true
                     end
                 end
@@ -1180,8 +1184,8 @@ local function _is_table_equals(actual, expected, recursions)
 
     return true
 end
-M.private._is_table_equals = _is_table_equals
-is_equal = _is_table_equals
+private._is_table_equals = _is_table_equals
+private.is_equal = _is_table_equals
 
 local function failure(main_msg, extra_msg_or_nil, level)
     -- raise an error indicating a test failure
@@ -1200,7 +1204,7 @@ local function fail_fmt(level, extra_msg_or_nil, ...)
      -- failure with printf-style formatted message and given error level
     failure(string.format(...), extra_msg_or_nil, (level or 1) + 1)
 end
-M.private.fail_fmt = fail_fmt
+private.fail_fmt = fail_fmt
 
 local function error_fmt(level, ...)
      -- printf-style error()
