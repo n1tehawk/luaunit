@@ -8,7 +8,7 @@
 
 set -eufo pipefail
 
-LUAJIT_VERSION="2.0.4"
+LUAJIT_VERSION="2.0.5"
 LUAJIT_BASE="LuaJIT-$LUAJIT_VERSION"
 
 source .travis/platform.sh
@@ -98,8 +98,8 @@ else # -e $LUA_HOME_DIR
             curl http://www.lua.org/ftp/lua-5.2.4.tar.gz | tar xz
             cd lua-5.2.4;
         elif [ "$LUA" == "lua5.3" ]; then
-            curl http://www.lua.org/ftp/lua-5.3.3.tar.gz | tar xz
-            cd lua-5.3.3;
+            curl http://www.lua.org/ftp/lua-5.3.4.tar.gz | tar xz
+            cd lua-5.3.4;
         fi
 
         # adjust numerical precision if requested with LUANUMBER=float
