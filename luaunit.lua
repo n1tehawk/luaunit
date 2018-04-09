@@ -97,14 +97,22 @@ function M._getPrivateExports()
 end
 
 ----------------------------------------------------------------
+--          some shortcuts to frequently used functions
+----------------------------------------------------------------
+
+local _concat, _insert = table.concat, table.insert
+local _format = string.format
+
+-- unpack is a global function for Lua 5.1, otherwise use table.unpack
+local _unpack = rawget(_G, "unpack") or table.unpack
+
+----------------------------------------------------------------
 --
 --                 general utility functions
 --
 ----------------------------------------------------------------
 
 local function pcall_or_abort(func, ...)
-    -- unpack is a global function for Lua 5.1, otherwise use table.unpack
-    local unpack = rawget(_G, "unpack") or table.unpack
     local result = {pcall(func, ...)}
     if not result[1] then
         -- an error occurred
@@ -113,7 +121,7 @@ local function pcall_or_abort(func, ...)
         print(M.USAGE)
         os.exit(-1)
     end
-    return unpack(result, 2)
+    return _unpack(result, 2)
 end
 
 local crossTypeOrdering = {
@@ -141,7 +149,7 @@ local function __genSortedIndex( t )
     local sortedIndex = {}
 
     for key,_ in pairs(t) do
-        table.insert(sortedIndex, key)
+        _insert(sortedIndex, key)
     end
 
     table.sort(sortedIndex, crossTypeSort)
@@ -234,10 +242,10 @@ local function strsplit(delimiter, text)
     while true do
         first, last = text:find(delimiter, pos, true)
         if first then -- found?
-            table.insert(list, text:sub(pos, first - 1))
+            _insert(list, text:sub(pos, first - 1))
             pos = last + 1
         else
-            table.insert(list, text:sub(pos))
+            _insert(list, text:sub(pos))
             break
         end
     end
@@ -416,7 +424,7 @@ local function stripLuaunitTrace( stackTrace )
     end
 
     -- print( prettystr(t) )
-    return table.concat( t, '\n')
+    return _concat( t, '\n')
 
 end
 private.stripLuaunitTrace = stripLuaunitTrace
@@ -601,7 +609,7 @@ local function getTaTbDescr()
 end
 
 local function extendWithStrFmt( res, ... )
-    table.insert( res, string.format( ... ) )
+    _insert( res, _format( ... ) )
 end
 
 local function mismatchFormattingMapping( table_a, table_b, doDeepAnalysis ) -- luacheck: ignore 212
@@ -629,19 +637,19 @@ local function mismatchFormattingMapping( table_a, table_b, doDeepAnalysis ) -- 
 
     for k,v in pairs( table_a ) do
         if is_equal( v, table_b[k] ) then
-            table.insert( keysCommon, k )
+            _insert( keysCommon, k )
         else 
             if table_b[k] == nil then
-                table.insert( keysOnlyTa, k )
+                _insert( keysOnlyTa, k )
             else
-                table.insert( keysDiffTaTb, k )
+                _insert( keysDiffTaTb, k )
             end
         end
     end
 
     for k,v in pairs( table_b ) do
         if not is_equal( v, table_a[k] ) and table_a[k] == nil then
-            table.insert( keysOnlyTb, k )
+            _insert( keysOnlyTb, k )
         end
     end
 
@@ -661,20 +669,20 @@ local function mismatchFormattingMapping( table_a, table_b, doDeepAnalysis ) -- 
             end
 
         if #keysCommon == 0 and #keysDiffTaTb == 0 then
-            table.insert( result, 'Table A and B have no keys in common, they are totally different')
+            _insert( result, 'Table A and B have no keys in common, they are totally different')
         else
             local s_other = 'other '
             if #keysCommon then
                 extendWithStrFmt( result, 'Table A and B have %d identical items', #keysCommon )
             else
-                table.insert( result, 'Table A and B have no identical items' )
+                _insert( result, 'Table A and B have no identical items' )
                 s_other = ''
             end
 
             if #keysDiffTaTb ~= 0 then
-                result[#result] = string.format( '%s and %d items differing present in both tables', result[#result], #keysDiffTaTb)
+                result[#result] = _format( '%s and %d items differing present in both tables', result[#result], #keysDiffTaTb)
             else
-                result[#result] = string.format( '%s and no %sitems differing present in both tables', result[#result], s_other, #keysDiffTaTb)
+                result[#result] = _format( '%s and no %sitems differing present in both tables', result[#result], s_other, #keysDiffTaTb)
             end
         end
 
@@ -689,7 +697,7 @@ local function mismatchFormattingMapping( table_a, table_b, doDeepAnalysis ) -- 
     end
 
     if #keysDiffTaTb ~= 0 then
-        table.insert( result, 'Items differing in A and B:')
+        _insert( result, 'Items differing in A and B:')
         for k,v in sortedPairs( keysDiffTaTb ) do
             extendWithStrFmt( result, '  - A[%s]: %s', keytostring(v), prettystr(table_a[v]) )
             extendWithStrFmt( result, '  + B[%s]: %s', keytostring(v), prettystr(table_b[v]) )
@@ -697,27 +705,27 @@ local function mismatchFormattingMapping( table_a, table_b, doDeepAnalysis ) -- 
     end    
 
     if #keysOnlyTa ~= 0 then
-        table.insert( result, 'Items only in table A:' )
+        _insert( result, 'Items only in table A:' )
         for k,v in sortedPairs( keysOnlyTa ) do
             extendWithStrFmt( result, '  - A[%s]: %s', keytostring(v), prettystr(table_a[v]) )
         end
     end
 
     if #keysOnlyTb ~= 0 then
-        table.insert( result, 'Items only in table B:' )
+        _insert( result, 'Items only in table B:' )
         for k,v in sortedPairs( keysOnlyTb ) do
             extendWithStrFmt( result, '  + B[%s]: %s', keytostring(v), prettystr(table_b[v]) )
         end
     end
 
     if #keysCommon ~= 0 then
-        table.insert( result, 'Items common to A and B:')
+        _insert( result, 'Items common to A and B:')
         for k,v in sortedPairs( keysCommon ) do
             extendWithStrFmt( result, '  = A and B [%s]: %s', keytostring(v), prettystr(table_a[v]) )
         end
     end    
 
-    return true, table.concat( result, '\n')
+    return true, _concat( result, '\n')
     ]]
 end
 private.mismatchFormattingMapping = mismatchFormattingMapping
@@ -772,13 +780,13 @@ local function mismatchFormattingPureList( table_a, table_b )
     ]]
     local result, refa, refb, descrTa, descrTb = {}, '', '', getTaTbDescr()
     if M.PRINT_TABLE_REF_IN_ERROR_MSG then
-        refa, refb = string.format( '<%s> ', tostring(table_a)), string.format('<%s> ', tostring(table_b) )
+        refa, refb = _format( '<%s> ', tostring(table_a)), _format('<%s> ', tostring(table_b) )
     end
 
     local len_a, len_b, longest, shortest, deltalv, commonUntil, commonBackTo
           = list_compare(table_a, table_b)
 
-    table.insert( result, 'List difference analysis:' )    
+    _insert( result, 'List difference analysis:' )
     if len_a == len_b then
         -- TODO: handle expected/actual naming
         extendWithStrFmt( result, '* lists %sA (%s) and %sB (%s) have the same size', refa, descrTa, refb, descrTb )
@@ -807,7 +815,7 @@ local function mismatchFormattingPureList( table_a, table_b )
 
     -- common parts to list A & B, at the beginning
     if commonUntil > 0 then
-        table.insert( result, '* Common parts:' )
+        _insert( result, '* Common parts:' )
         for i = 1, commonUntil do
             insertABValue( i )
         end
@@ -815,7 +823,7 @@ local function mismatchFormattingPureList( table_a, table_b )
 
     -- diffing parts to list A & B
     if commonUntil < shortest - commonBackTo - 1 then
-        table.insert( result, '* Differing parts:' )
+        _insert( result, '* Differing parts:' )
         for i = commonUntil + 1, shortest - commonBackTo - 1 do
             insertABValue( i )
         end
@@ -823,13 +831,13 @@ local function mismatchFormattingPureList( table_a, table_b )
 
     -- display indexes of one list, with no match on other list
     if shortest - commonBackTo <= longest - commonBackTo - 1 then
-        table.insert( result, '* Present only in one list:' )
+        _insert( result, '* Present only in one list:' )
         for i = shortest - commonBackTo, longest - commonBackTo - 1 do
             if len_a > len_b then
                 extendWithStrFmt( result, '  - A[%d]: %s', i, prettystr(table_a[i]) )
-                -- table.insert( result, '+ (no matching B index)')
+                -- _insert( result, '+ (no matching B index)')
             else
-                -- table.insert( result, '- no matching A index')
+                -- _insert( result, '- no matching A index')
                 extendWithStrFmt( result, '  + B[%d]: %s', i, prettystr(table_b[i]) )
             end
         end
@@ -837,7 +845,7 @@ local function mismatchFormattingPureList( table_a, table_b )
 
     -- common parts to list A & B, at the end
     if commonBackTo >= 0 then
-        table.insert( result, '* Common parts at the end of the lists' )
+        _insert( result, '* Common parts at the end of the lists' )
         for i = longest - commonBackTo, longest do
             if len_a > len_b then
                 insertABValue( i, i-deltalv )
@@ -847,7 +855,7 @@ local function mismatchFormattingPureList( table_a, table_b )
         end
     end
 
-    return true, table.concat( result, '\n')
+    return true, _concat( result, '\n')
 end
 private.mismatchFormattingPureList = mismatchFormattingPureList
 
@@ -951,7 +959,7 @@ private._table_tostring = _table_tostring -- prettystr_sub() needs it
 
 local function _table_tostring_format_multiline_string( tbl_str, indentLevel )
     local indentString = '\n'..string.rep("    ", indentLevel - 1)
-    return table.concat( tbl_str, indentString )
+    return _concat( tbl_str, indentString )
 
 end
 private._table_tostring_format_multiline_string = _table_tostring_format_multiline_string
@@ -990,18 +998,18 @@ local function _table_tostring_format_result( tbl, result, indentLevel, printTab
         result = {  
                     "{\n    ", 
                     indentString,
-                    table.concat(result, ",\n    " .. indentString), 
+                    _concat(result, ",\n    " .. indentString),
                     "\n",
                     indentString, 
                     "}"
                 }
     else
-        result = {"{", table.concat(result, TABLE_TOSTRING_SEP), "}"}
+        result = {"{", _concat(result, TABLE_TOSTRING_SEP), "}"}
     end
     if printTableRefs then
-        table.insert(result, 1, "<".._table_raw_tostring(tbl).."> ") -- prepend table ref
+        _insert(result, 1, "<".._table_raw_tostring(tbl).."> ") -- prepend table ref
     end
-    return table.concat(result)
+    return _concat(result)
 end
 private._table_tostring_format_result = _table_tostring_format_result -- prettystr_sub() needs it
 
@@ -1128,7 +1136,7 @@ local function _is_table_equals(actual, expected, recursions)
                 -- can have _is_table_equals(t[k1], t[k2]) despite k1 ~= k2. So
                 -- we first collect table keys from "actual", and then later try
                 -- to match each table key from "expected" to actualTableKeys.
-                table.insert(actualTableKeys, k)
+                _insert(actualTableKeys, k)
             else
                 if not _is_table_equals(v, expected[k], recursions) then
                     return false -- Mismatch on value, tables can't be equal
@@ -1200,13 +1208,13 @@ end
 
 local function fail_fmt(level, extra_msg_or_nil, ...)
      -- failure with printf-style formatted message and given error level
-    failure(string.format(...), extra_msg_or_nil, (level or 1) + 1)
+    failure(_format(...), extra_msg_or_nil, (level or 1) + 1)
 end
 private.fail_fmt = fail_fmt
 
 local function error_fmt(level, ...)
      -- printf-style error()
-    error(string.format(...), (level or 1) + 1)
+    error(_format(...), (level or 1) + 1)
 end
 
 ----------------------------------------------------------------
@@ -1222,18 +1230,17 @@ local function errorMsgEquality(actual, expected, doDeepAnalysis)
     end
     if type(expected) == 'string' or type(expected) == 'table' then
         local strExpected, strActual = prettystrPairs(expected, actual)
-        local result = string.format("expected: %s\nactual: %s", strExpected, strActual)
+        local result = _format("expected: %s\nactual: %s", strExpected, strActual)
 
         -- extend with mismatch analysis if possible:
         local success, mismatchResult
         success, mismatchResult = tryMismatchFormatting( actual, expected, doDeepAnalysis )
         if success then 
-            result = table.concat( { result, mismatchResult }, '\n' )
+            result = _concat( { result, mismatchResult }, '\n' )
         end
         return result
     end
-    return string.format("expected: %s, actual: %s",
-                         prettystr(expected), prettystr(actual))
+    return _format("expected: %s, actual: %s", prettystr(expected), prettystr(actual))
 end
 
 function M.assertError(f, ...)
@@ -2060,17 +2067,17 @@ JUnitOutput.__class__ = 'JUnitOutput'
         -- XML file writing
         self.fd:write('<?xml version="1.0" encoding="UTF-8" ?>\n')
         self.fd:write('<testsuites>\n')
-        self.fd:write(string.format(
+        self.fd:write(_format(
             '    <testsuite name="LuaUnit" id="00001" package="" hostname="localhost" tests="%d" timestamp="%s" time="%0.3f" errors="%d" failures="%d">\n',
             self.result.runCount, self.result.startIsodate, self.result.duration, self.result.errorCount, self.result.failureCount ))
         self.fd:write("        <properties>\n")
-        self.fd:write(string.format('            <property name="Lua Version" value="%s"/>\n', _VERSION ) )
-        self.fd:write(string.format('            <property name="LuaUnit Version" value="%s"/>\n', M.VERSION) )
+        self.fd:write(_format('            <property name="Lua Version" value="%s"/>\n', _VERSION ) )
+        self.fd:write(_format('            <property name="LuaUnit Version" value="%s"/>\n', M.VERSION) )
         -- XXX please include system name and version if possible
         self.fd:write("        </properties>\n")
 
         for _, node in ipairs(self.result.tests) do
-            self.fd:write(string.format('        <testcase classname="%s" name="%s" time="%0.3f">\n',
+            self.fd:write(_format('        <testcase classname="%s" name="%s" time="%0.3f">\n',
                 node.className, node.testName, node.duration ) )
             if node:isNotPassed() then
                 self.fd:write(node:statusXML())
@@ -2355,7 +2362,7 @@ end
         local testNames = {}
         for k, _ in pairs(_G) do
             if type(k) == "string" and M.LuaUnit.isTestName( k ) then
-                table.insert( testNames , k )
+                _insert( testNames , k )
             end
         end
         table.sort( testNames )
@@ -2449,7 +2456,7 @@ end
                 return
             elseif state == SET_PATTERN then
                 if result['pattern'] then
-                    table.insert( result['pattern'], cmdArg )
+                    _insert( result['pattern'], cmdArg )
                 else
                     result['pattern'] = { cmdArg }
                 end
@@ -2457,7 +2464,7 @@ end
             elseif state == SET_EXCLUDE then
                 local notArg = '!'..cmdArg
                 if result['pattern'] then
-                    table.insert( result['pattern'],  notArg )
+                    _insert( result['pattern'],  notArg )
                 else
                     result['pattern'] = { notArg }
                 end
@@ -2476,7 +2483,7 @@ end
                     state = parseOption( cmdArg )
                 else
                     if result['testNames'] then
-                        table.insert( result['testNames'], cmdArg )
+                        _insert( result['testNames'], cmdArg )
                     else
                         result['testNames'] = { cmdArg }
                     end
@@ -2567,12 +2574,12 @@ end
 
     function NodeStatus:statusXML()
         if self:isError() then
-            return table.concat(
+            return _concat(
                 {'            <error type="', xmlEscape(self.msg), '">\n',
                  '                <![CDATA[', xmlCDataEscape(self.stackTrace),
                  ']]></error>\n'})
         elseif self:isFailure() then
-            return table.concat(
+            return _concat(
                 {'            <failure type="', xmlEscape(self.msg), '">\n',
                  '                <![CDATA[', xmlCDataEscape(self.stackTrace),
                  ']]></failure>\n'})
@@ -2588,30 +2595,29 @@ end
         if number ~= 1 then -- use plural
             suffix = (singular:sub(-2) == 'ss') and 'es' or 's'
         end
-        return string.format('%d %s%s', number, singular, suffix)
+        return _format('%d %s%s', number, singular, suffix)
     end
 
     function M.LuaUnit.statusLine(result)
         -- return status line string according to results
         local s = {
-            string.format('Ran %d tests in %0.3f seconds',
-                          result.runCount, result.duration),
+            _format('Ran %d tests in %0.3f seconds', result.runCount, result.duration),
             conditional_plural(result.passedCount, 'success'),
         }
         if result.notPassedCount > 0 then
             if result.failureCount > 0 then
-                table.insert(s, conditional_plural(result.failureCount, 'failure'))
+                _insert(s, conditional_plural(result.failureCount, 'failure'))
             end
             if result.errorCount > 0 then
-                table.insert(s, conditional_plural(result.errorCount, 'error'))
+                _insert(s, conditional_plural(result.errorCount, 'error'))
             end
         else
-            table.insert(s, '0 failures')
+            _insert(s, '0 failures')
         end
         if result.nonSelectedCount > 0 then
-            table.insert(s, string.format("%d non-selected", result.nonSelectedCount))
+            _insert(s, _format("%d non-selected", result.nonSelectedCount))
         end
-        return table.concat(s, ', ')
+        return _concat(s, ', ')
     end
 
     function M.LuaUnit:startSuite(testCount, nonSelectedCount)
@@ -2653,7 +2659,7 @@ end
             self.result.currentClassName
         )
         self.result.currentNode.startTime = os.clock()
-        table.insert( self.result.tests, self.result.currentNode )
+        _insert( self.result.tests, self.result.currentNode )
         self.output:startTest( testName )
     end
 
@@ -2682,15 +2688,15 @@ end
 
         if err.status == NodeStatus.FAIL then
             node:fail( err.msg, err.trace )
-            table.insert( self.result.failures, node )
+            _insert( self.result.failures, node )
         elseif err.status == NodeStatus.ERROR then
             node:error( err.msg, err.trace )
-            table.insert( self.result.errors, node )
+            _insert( self.result.errors, node )
         end
 
         if node:isFailure() or node:isError() then
             -- add to the list of failed tests (gets printed separately)
-            table.insert( self.result.notPassed, node )
+            _insert( self.result.notPassed, node )
         end
         self.output:addStatus( node )
     end
@@ -2888,7 +2894,7 @@ end
         ]]
         for methodName, methodInstance in sortedPairs(classInstance) do
             if M.LuaUnit.asFunction(methodInstance) and M.LuaUnit.isMethodTestName( methodName ) then
-                table.insert( result, { className..'.'..methodName, classInstance } )
+                _insert( result, { className..'.'..methodName, classInstance } )
             end
         end
     end
@@ -2910,7 +2916,7 @@ end
         for _, v in ipairs( listOfNameAndInst ) do
             local name, instance = v[1], v[2]
             if M.LuaUnit.asFunction(instance) then
-                table.insert( result, { name, instance } )
+                _insert( result, { name, instance } )
             else
                 if type(instance) ~= 'table' then
                     error( 'Instance must be a table or a function, not a '..type(instance)..' with value '..prettystr(instance))
@@ -2921,7 +2927,7 @@ end
                     if methodInstance == nil then
                         error( "Could not find method in class "..tostring(className).." for method "..tostring(methodName) )
                     end
-                    table.insert( result, { name, instance } )
+                    _insert( result, { name, instance } )
                 else
                     M.LuaUnit.expandOneClass( result, name, instance )
                 end
@@ -2936,9 +2942,9 @@ end
         for _, v in ipairs( listOfNameAndInst ) do
             -- local name, instance = v[1], v[2]
             if  patternFilter( patternIncFilter, v[1] ) then
-                table.insert( included, v )
+                _insert( included, v )
             else
-                table.insert( excluded, v )
+                _insert( excluded, v )
             end
         end
         return included, excluded
@@ -3032,7 +3038,7 @@ end
                 error( 'Name must match a function or a table: '..instanceName )
             end
 
-            table.insert( listOfNameAndInst, { name, instance } )
+            _insert( listOfNameAndInst, { name, instance } )
         end
 
         self:runSuiteByInstances( listOfNameAndInst )
