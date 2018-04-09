@@ -488,33 +488,38 @@ local function prettystr( v )
 end
 M.prettystr = prettystr
 
-local function _adjust_err_msg_with_iter( err_msg, iter_msg )
+local function _adjust_err_msg_with_iter( err_msg, iter )
     --[[ Adjust the error message err_msg: trim the FAILURE_PREFIX or SUCCESS_PREFIX information if needed, 
     add the iteration message if any and return the result.
 
     err_msg:  string, error message captured with pcall
-    iter_msg: a string describing the current iteration ("iteration N") or nil
-              if there is no iteration in this test.
+    iter:     a (pass) number describing the current iteration ("iteration N")
+              or nil if there is no iteration in this test.
 
     Returns: (new_err_msg, test_status)
         new_err_msg: string, adjusted error message, or nil in case of success
         test_status: M.NodeStatus.FAIL, SUCCESS or ERROR according to the information
                      contained in the error message.
     ]]
-    if iter_msg then
-        iter_msg = iter_msg..', '
-    else
-        iter_msg = ''
+
+    -- "./test\\test_luaunit.lua:2241: some error msg"
+    local file_line = err_msg:match('(:%d+: )')
+
+    local function find_with_file_line(prefix)
+        if file_line ~= nil then
+            return err_msg:find(file_line .. prefix) ~= nil
+        end
+        return false
     end
 
-    local RE_FILE_LINE = '.*:%d+: '
-
-    if (err_msg:find( M.SUCCESS_PREFIX ) == 1) or err_msg:match( '('..RE_FILE_LINE..')' .. M.SUCCESS_PREFIX .. ".*" ) then
+    if (err_msg:find( M.SUCCESS_PREFIX, 1, true ) == 1) or find_with_file_line( M.SUCCESS_PREFIX ) then
         -- test finished early with success()
         return nil, M.NodeStatus.PASS
     end
 
-    if (err_msg:find( M.FAILURE_PREFIX ) == 1) or (err_msg:match( '('..RE_FILE_LINE..')' .. M.FAILURE_PREFIX .. ".*" ) ~= nil) then
+    local iter_msg = iter and _format('iteration %d, ', iter) or ''
+
+    if (err_msg:find( M.FAILURE_PREFIX, 1, true ) == 1) or find_with_file_line( M.FAILURE_PREFIX ) then
         -- substitute prefix by iteration message
         err_msg = err_msg:gsub(M.FAILURE_PREFIX, iter_msg, 1)
         -- print("failure detected")
@@ -522,16 +527,11 @@ local function _adjust_err_msg_with_iter( err_msg, iter_msg )
     else
         -- print("error detected")
         -- regular error, not a failure
-        if iter_msg then
-            local match
-            -- "./test\\test_luaunit.lua:2241: some error msg
-            match = err_msg:match( '(.*:%d+: ).*' ) 
-            if match then
-                err_msg = err_msg:gsub( match, match .. iter_msg )
-            else
-                -- no file:line: information, just add the iteration info at the beginning of the line
-                err_msg = iter_msg .. err_msg
-            end
+        if file_line then
+            err_msg = err_msg:gsub(file_line, file_line .. iter_msg, 1)
+        else
+            -- no file:line: information, just add the iteration info at the beginning of the line
+            err_msg = iter_msg .. err_msg
         end
         return err_msg, M.NodeStatus.ERROR
     end
@@ -2785,7 +2785,8 @@ end
             return {
                 status = NodeStatus.ERROR,
                 msg = e,
-                trace = string.sub(debug.traceback("", 3), 2)
+                trace = string.sub(debug.traceback("", 3), 2),
+                iter = self.exeRepeat and self.currentCount or nil,
             }
         end
 
@@ -2800,10 +2801,7 @@ end
             return {status = NodeStatus.PASS}
         end
 
-        local iter_msg
-        iter_msg = self.exeRepeat and 'iteration '..self.currentCount
-
-        err.msg, err.status = _adjust_err_msg_with_iter( err.msg, iter_msg )
+        err.msg, err.status = _adjust_err_msg_with_iter( err.msg, err.iter )
 
         if err.status == NodeStatus.PASS then
             err.trace = nil
