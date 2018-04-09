@@ -483,7 +483,7 @@ local function prettystr( v )
 end
 M.prettystr = prettystr
 
-function M.adjust_err_msg_with_iter( err_msg, iter_msg )
+local function _adjust_err_msg_with_iter( err_msg, iter_msg )
     --[[ Adjust the error message err_msg: trim the FAILURE_PREFIX or SUCCESS_PREFIX information if needed, 
     add the iteration message if any and return the result.
 
@@ -531,6 +531,7 @@ function M.adjust_err_msg_with_iter( err_msg, iter_msg )
         return err_msg, M.NodeStatus.ERROR
     end
 end
+private._adjust_err_msg_with_iter = _adjust_err_msg_with_iter
 
 local function tryMismatchFormatting( table_a, table_b, doDeepAnalysis )
     --[[
@@ -2799,7 +2800,7 @@ end
         local iter_msg
         iter_msg = self.exeRepeat and 'iteration '..self.currentCount
 
-        err.msg, err.status = M.adjust_err_msg_with_iter( err.msg, iter_msg )
+        err.msg, err.status = _adjust_err_msg_with_iter( err.msg, iter_msg )
 
         if err.status == NodeStatus.PASS then
             err.trace = nil

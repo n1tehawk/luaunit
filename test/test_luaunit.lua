@@ -2333,7 +2333,7 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
 
         --------------- FAIL ---------------------
         -- file-line info, strip failure prefix, no iteration info
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             '.\\test\\test_luaunit.lua:2247: LuaUnit test FAILURE: Expected an error when calling function but no error generated',
             nil )
         lu.assertEquals( { err_msg, status },           
@@ -2341,7 +2341,7 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
                 lu.NodeStatus.FAIL } )
 
         -- file-line info, strip failure prefix, with iteration info
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             '.\\test\\test_luaunit.lua:2247: LuaUnit test FAILURE: Expected an error when calling function but no error generated',
             'iteration 33' )
         lu.assertEquals( { err_msg, status },
@@ -2349,7 +2349,7 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
                 lu.NodeStatus.FAIL } )
 
         -- no file-line info, strip failure prefix, no iteration info
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             'LuaUnit test FAILURE: Expected an error when calling function but no error generated',
             nil )
         lu.assertEquals( { err_msg, status },           
@@ -2357,7 +2357,7 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
                 lu.NodeStatus.FAIL } )
 
         -- no file-line info, strip failure prefix, with iteration info
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             'LuaUnit test FAILURE: Expected an error when calling function but no error generated',
             'iteration 33' )
         lu.assertEquals( { err_msg, status },
@@ -2366,7 +2366,7 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
 
         --------------- ERROR ---------------------
         -- file-line info, pure error, no iteration info, do nothing
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             '.\\test\\test_luaunit.lua:2723: teardown error',
             nil )
         lu.assertEquals( { err_msg, status },           
@@ -2374,7 +2374,7 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
                 lu.NodeStatus.ERROR } )
 
         -- file-line info, pure error, add iteration info
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             '.\\test\\test_luaunit.lua:2723: teardown error',
             'iteration 33' )
         lu.assertEquals( { err_msg, status },
@@ -2382,7 +2382,7 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
                 lu.NodeStatus.ERROR } )
 
         -- no file-line info, pure error, no iteration info, do nothing
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             'teardown error',
             nil )
         lu.assertEquals( { err_msg, status },           
@@ -2390,7 +2390,7 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
                 lu.NodeStatus.ERROR } )
 
         -- no file-line info, pure error, add iteration info
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             'teardown error',
             'iteration 33' )
         lu.assertEquals( { err_msg, status },
@@ -2399,28 +2399,28 @@ TestLuaUnitErrorMsg = { __class__ = 'TestLuaUnitErrorMsg' }
 
         --------------- PASS ---------------------
         -- file-line info, success, return empty error message
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             '.\\test\\test_luaunit.lua:2247: LuaUnit test SUCCESS: the test did actually work !',
             nil )
         lu.assertEquals( { err_msg, status },           
             { nil, lu.NodeStatus.PASS } )
 
         -- file-line info, success, return empty error message, even with iteration
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             '.\\test\\test_luaunit.lua:2247: LuaUnit test SUCCESS: the test did actually work !',
             'iteration 33' )
         lu.assertEquals( { err_msg, status },
             { nil, lu.NodeStatus.PASS } )
 
         -- no file-line info, success, return empty error message
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             'LuaUnit test SUCCESS: the test did actually work !',
             nil )
         lu.assertEquals( { err_msg, status },           
             { nil, lu.NodeStatus.PASS } )
 
         -- no file-line info, success, return empty error message, even with iteration
-        err_msg, status = lu.adjust_err_msg_with_iter( 
+        err_msg, status = private._adjust_err_msg_with_iter(
             'LuaUnit test SUCCESS: the test did actually work !',
             'iteration 33' )
         lu.assertEquals( { err_msg, status },
